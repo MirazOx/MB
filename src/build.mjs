@@ -239,10 +239,13 @@ function buildIndex() {
   // Largest first so the float reads deliberately.
   const ordered = [...outlets].sort((a, b) => (logoWeight[b.name] || 1.5) - (logoWeight[a.name] || 1.5));
   const logos = ordered
-    .map((o) => `<li class="logo reveal" style="--s:${logoWeight[o.name] || 1.5}">
+    .map((o) => {
+      const isText = o.logo.endsWith('.svg');
+      return `<li class="logo reveal ${isText ? 'logo--text' : 'logo--icon'}" style="--s:${logoWeight[o.name] || 1.5}">
       <img src="assets/logos/${o.logo}" alt="${attr(o.name)} logo" loading="lazy" onerror="this.style.visibility='hidden'">
-      <span>${esc(o.name)}</span>
-    </li>`)
+      ${isText ? '' : `<span>${esc(o.name)}</span>`}
+    </li>`;
+    })
     .join("\n");
 
   const body = `
