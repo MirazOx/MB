@@ -223,17 +223,19 @@ function archiveBlock(items, { withBeat = true } = {}) {
   const outletsSorted = Object.keys(oc).sort((a, b) => oc[b] - oc[a]);
   const years = [...new Set(items.map((x) => x.year).filter(Boolean))].sort().reverse();
   const beatOpts = withBeat ? beats.map((b) => `<option value="${b.id}">${esc(b.name)} (${beatCounts[b.id] || 0})</option>`).join("") : "";
-  const outletOpts = outletsSorted.map((o) => `<option value="${attr(o)}">${esc(o)} (${oc[o]})</option>`).join("");
+  const outletOpts = outletsSorted.map((o) => `<option value="${attr(o)}">${esc(o)}</option>`).join("");
   const yearOpts = years.map((y) => `<option value="${esc(y)}">${esc(y)}</option>`).join("");
   const rows = items.map((x) => archiveRow(x, { showBeat: true })).join("\n");
   return `
 <div class="filterbar filterbar--archive"><div class="wrap">
   <div class="controls">
     <input type="search" id="q" class="search" placeholder="Search titles or outlets…" aria-label="Search stories" autocomplete="off">
-    ${withBeat ? `<select id="f-beat" aria-label="Filter by beat"><option value="">All beats</option>${beatOpts}</select>` : ""}
-    <select id="f-outlet" aria-label="Filter by outlet"><option value="">All outlets (${items.length})</option>${outletOpts}</select>
-    <select id="f-year" aria-label="Filter by year"><option value="">All years</option>${yearOpts}</select>
-    <select id="f-sort" aria-label="Sort order"><option value="random" selected>Shuffle (Random)</option><option value="new">Newest first</option><option value="old">Oldest first</option><option value="az">Title A–Z</option></select>
+    <div class="filters">
+      ${withBeat ? `<select id="f-beat" aria-label="Filter by beat"><option value="">All beats</option>${beatOpts}</select>` : ""}
+      <select id="f-outlet" aria-label="Filter by outlet"><option value="">All outlets</option>${outletOpts}</select>
+      <select id="f-year" aria-label="Filter by year"><option value="">All years</option>${yearOpts}</select>
+      <select id="f-sort" aria-label="Sort order"><option value="random" selected>Default</option><option value="new">Newest first</option><option value="old">Oldest first</option><option value="az">Title A–Z</option></select>
+    </div>
   </div>
   <p class="count" id="count" aria-live="polite">Showing ${items.length} of ${items.length} pieces</p>
 </div></div>

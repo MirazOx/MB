@@ -654,14 +654,22 @@ a:focus-visible, button:focus-visible {
 
 /* ----------------------------- Archive controls ------------------------ */
 .filterbar--archive .wrap { display: flex; flex-direction: column; gap: 0.75rem; }
-.controls { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+/* search stretches end-to-end; the selects sit below, each sized to its text */
+.controls { display: flex; flex-direction: column; gap: 0.6rem; }
+.filters { display: flex; flex-wrap: wrap; gap: 0.55rem; }
 .search, .controls select {
   font-family: var(--mono); font-size: 0.82rem; color: var(--ink);
   background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px;
   padding: 0.6rem 0.85rem;
 }
-.search { flex: 1 1 260px; min-width: 200px; }
-.controls select { cursor: pointer; padding-right: 1.8rem; }
+.search { width: 100%; }
+.controls select {
+  cursor: pointer; padding-right: 2rem; width: auto; flex: 0 0 auto;
+  field-sizing: content;                 /* size to the selected label, no dead space */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23586475' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.7rem center;
+  -webkit-appearance: none; appearance: none;
+}
 .search::placeholder { color: var(--ink-muted); }
 .search:focus, .controls select:focus { outline: none; border-color: var(--ember-ink); box-shadow: 0 0 0 3px var(--ember-wash); }
 .count { font-family: var(--mono); font-size: 0.74rem; color: var(--ink-muted); }
