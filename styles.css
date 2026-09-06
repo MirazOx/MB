@@ -459,7 +459,7 @@ p { margin: 0; text-wrap: pretty; }
 .channels a:hover { color: var(--ember-ink); }
 .channels a:hover .k { color: var(--ember-ink); }
 .channels a:hover .v .arw { transform: translate(3px, -3px); }
-.contact .tipnote { margin-top: 1.75rem; font-size: 0.9rem; color: var(--ink-muted); max-width: 54ch; line-height: 1.6; }
+.contact .tipnote { margin-top: 1.75rem; font-size: 0.9rem; color: var(--ink-muted);  line-height: 1.6; }
 @media (max-width: 620px) { .channels a { border-right: none; } }
 
 /* ----------------------------- Footer ---------------------------------- */
