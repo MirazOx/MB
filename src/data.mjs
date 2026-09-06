@@ -14,7 +14,7 @@ export const site = {
   // Kept accurate to the public record; adjust freely.
   title: "Senior feature writer, The Business Standard",
   tagline:
-    "Investigative and long-form reporting on migration, climate, and power in Bangladesh.",
+    "Award winning journalist specialized in investigative and long-form reporting on migration, climate, and power in Bangladesh.",
   intro:
     "I report from Bangladesh on the people caught inside the country's largest forces: the migrant routes that end in trafficking, a coastline losing ground to salt water, and a political order remade by the 2024 uprising. The work is long-form, data-driven, and reported on the ground.",
   contact: {
