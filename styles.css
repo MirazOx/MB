@@ -794,7 +794,7 @@ a:focus-visible, button:focus-visible {
 .cover-img { width: 100%; height: clamp(340px, 62vh, 600px); object-fit: cover; object-position: 50% 12%; display: block; }
 .cover::after { content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, rgba(17,24,39,0.74), rgba(17,24,39,0.22) 38%, rgba(17,24,39,0) 64%); }
-.cover-cap { position: absolute; left: 0; right: 0; top: clamp(3rem, 6vw, 5rem); z-index: 2; color: #fff; }
+.cover-cap { position: absolute; left: clamp(1.5rem, 5vw, 4rem); top: clamp(3rem, 6vw, 5rem); z-index: 2; color: #fff; max-width: max-content; }
 .cover-cap .eyebrow { color: rgba(255,255,255,0.82); }
 .cover-cap h1 { font-family: var(--display); font-size: clamp(2.6rem, 1.6rem + 4vw, 4.6rem); line-height: 0.95; letter-spacing: -0.022em; color: #fff; margin: 0.4rem 0 0.5rem; }
 .cover-role { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.86); }

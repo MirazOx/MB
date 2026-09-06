@@ -94,7 +94,7 @@ function head(title, desc, current) {
     ${nav("fellowships.html", "Credentials")}
     ${nav("beyond.html", "Beyond")}
     ${nav("about.html", "About")}
-    <a class="pill" href="about.html#contact">Get in touch</a>
+    <a class="pill" href="mailto:${site.contact.email}">Get in touch</a>
   </nav>
 </div></header>
 <main id="main">`;
@@ -131,7 +131,7 @@ function foot() {
     youtube: icon('<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>')
   };
 
-  return `${contactBand()}
+  return `\n
 <footer class="footer"><div class="wrap footer-grid">
   <div class="f-left">
     <div class="f-loc">
@@ -424,7 +424,7 @@ function buildAbout() {
   const body = `
 <section class="cover">
   <img class="cover-img" src="assets/masum-cover.jpg" alt="Masum Billah in the Nepal Himalaya" width="1280" height="855">
-  <div class="cover-cap wrap">
+  <div class="cover-cap">
     <p class="eyebrow">About</p>
     <h1 class="display">Masum Billah</h1>
     
