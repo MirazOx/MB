@@ -51,14 +51,6 @@ export const publications = outlets.map((o) => o.name);
 // the keyword classifier that files every scraped article into a beat.
 export const beats = [
   {
-    id: "climate",
-    name: "Climate",
-    full: "Climate & Environment",
-    blurb:
-      "A delta under pressure: salinity creeping inland, rivers poisoned, wildlife cornered, and the science of a changing monsoon.",
-    kw: ["climate", "flood", "cyclone", "salin", "environment", "river", "wildlife", "snake", "viper", "nilgai", "hyacinth", "pollution", "biodiversity", "drought", "monsoon", "coastal", "sundarban", "elephant", "dolphin", "aquaculture", "wind power", "solar", "renewable", "carbon", "emission", "cop30", "cop29", "cop28", "tiger", "forest", "nature", "ecosystem", "plastic", "groundwater", "arsenic", "char", "haor", "delta", "heatwave", "waste", "conservation", "bird"],
-  },
-  {
     id: "migration",
     name: "Migration",
     full: "Migration & Trafficking",
@@ -67,53 +59,92 @@ export const beats = [
     kw: ["migrant", "migrat", "trafficke", "trafficking", "cambodia", "malaysia", "saudi", "qatar", "gulf", "remittance", "expatriate", "smuggl", "slavery", "recruit", "deport", "italy fever", "diaspora", "overseas", "kafala", "returnee", "manpower", "visa trade", "kuwait", "oman", "uae ", "dubai", "libya", "lebanon", "jordan", "housemaid", "domestic worker", "foreign employment", "labour migration", "labor migration", "irregular migration", "human smuggling", "bmet"],
   },
   {
-    id: "economy",
-    name: "Economy",
-    full: "Economy & Business",
+    id: "climate",
+    name: "Climate",
+    full: "Climate & Environment",
     blurb:
-      "The garment floor and the wider economy: wages, exports, inflation, budgets, and the people who absorb the shocks first.",
-    kw: ["econom", "inflation", "garment", "rmg", "apparel", "bgmea", "export", "import", "bank", "taka", "forex", "gdp", "trade", "factory", "wage", "union", "industry", "business", "investment", "budget", "adb", "imf", "tax", "revenue", "entrepreneur", "loan", "debt", "market", "tariff", "price", "sme", "stock", "reserve", "subsidy", "fuel"],
+      "A delta under pressure: salinity creeping inland, rivers poisoned, wildlife cornered, brick kilns and the science of a changing monsoon.",
+    kw: ["climate", "flood", "cyclone", "salin", "environment", "river", "wildlife", "snake", "viper", "nilgai", "hyacinth", "pollution", "biodiversity", "drought", "monsoon", "coastal", "sundarban", "elephant", "dolphin", "aquaculture", "wind power", "solar", "renewable", "carbon", "emission", "cop30", "cop29", "cop28", "tiger", "forest", "nature", "ecosystem", "plastic", "groundwater", "arsenic", "char", "haor", "delta", "heat", "waste", "conservation", "bird", "brick kiln", "polythene", "rice", "paddy", "agricultur", "farm", "jute", "marine", "oyster", "st martin", "padma", "turag", "ilish", "fishing", "gas crisis", "lng", "seaweed"],
   },
   {
-    id: "politics",
-    name: "Politics",
-    full: "Politics & Power",
+    id: "health",
+    name: "Health",
+    full: "Health & Medicine",
     blurb:
-      "Reporting a country remade: the fall of Sheikh Hasina, the disappeared, and an election held after seventeen years.",
-    kw: ["election", "awami", "bnp", "jamaat", "hasina", "parliament", "protest", "quota", "uprising", "disappeared", "referendum", "constitution", "july charter", "ncp", "interim government", "tarique", "yunus", "cabinet", "poll", "campaign", "rally", "sedition", "tribunal", "verdict", "coup", "student-led", "voter", "ballot", "politic", "government", "party"],
-  },
-  {
-    id: "geopolitics",
-    name: "Geopolitics",
-    full: "Geopolitics & Diplomacy",
-    blurb:
-      "Bangladesh between giants: the Bay of Bengal, the China-India balance, Rohingya, and the diplomacy that shapes a nation's room to move.",
-    kw: ["china", "india", "geopolit", "diplomacy", "bay of bengal", "foreign", "iran", "teesta", "rohingya", "myanmar", "sanction", "belt and road", "quad", "indo-pacific", "delhi", "beijing", "washington", "treaty", "bilateral", "ambassador", "summit", "pakistan", "border", "relations", "corridor", "israel", "ukraine"],
+      "Bangladesh's health frontlines: hospitals and doctors under strain, the pharma trade, dengue and Nipah, and the long shadow of the pandemic.",
+    kw: ["health", "hospital", "doctor", "patient", "medic", "medicine", "pharma", "drug pric", "dengue", "nipah", "covid", "coronavirus", "pandemic", "vaccine", "disease", "epidemic", "herd immunity", " who ", "mental health", "nutrition", "cancer", "diabetes", "malaria", "antibiotic", "healthcare", "clinic", "surgery", "cure", "outbreak", "quarantine", "lockdown", "sanitation", "mosquito"],
   },
   {
     id: "rights",
     name: "Human Rights",
     full: "Rights, Gender & the Marginalised",
     blurb:
-      "Who the system protects and who it forgets: women's safety and freedom, labour and human rights, minorities, caste, and the people pushed to the edges.",
-    kw: ["human rights", "women", "woman ", "gender", "girl", "harassment", "domestic violence", "violence against", "rape", "child marriage", "child labour", "child labor", "dowry", "acid attack", "lgbt", "queer", "transgender", "disab", "minorit", "caste", "untouchable", "doms", "dom ", "press freedom", "freedom of expression", "torture", "custodial", "enforced disappear", "discrimination", "sexual", "widow", "marginal", "hijra"],
+      "Who the system protects and who it forgets: women's safety and freedom, press freedom, labour and human rights, minorities, and the people pushed to the edges.",
+    kw: ["human rights", "women", "woman ", "gender", "girl", "harassment", "domestic violence", "violence against", "rape", "child marriage", "child labour", "child labor", "dowry", "acid attack", "lgbt", "queer", "transgender", "disab", "minorit", "caste", "untouchable", "doms", "dom ", "press freedom", "freedom of expression", "free thought", "journalis", "torture", "custodial", "enforced disappear", "aynaghor", "police brutality", "extrajudicial", "impunity", "shipbreak", "discrimination", "sexual", "widow", "marginal", "hijra"],
+  },
+  {
+    id: "geopolitics",
+    name: "Geopolitics",
+    full: "Geopolitics & Diplomacy",
+    blurb:
+      "Bangladesh between giants and the wider world: the Bay of Bengal, the China-India balance, Rohingya, Gaza, and the diplomacy that shapes a nation's room to move.",
+    kw: ["china", "india", "geopolit", "diplomacy", "bay of bengal", "foreign", "iran", "teesta", "rohingya", "myanmar", "sanction", "belt and road", "quad", "indo-pacific", "delhi", "beijing", "washington", "treaty", "bilateral", "ambassador", "summit", "pakistan", "border", "relations", "corridor", "israel", "ukraine", "gaza", "hamas", "palestin", "taiwan", "pelosi", "taliban", "imran khan", "modi", "amit shah", "unga", "apartheid", "middle east", "nepal", "thailand", "xenophob", "spycraft", "mercenar", "wagner"],
+  },
+  {
+    id: "politics",
+    name: "Politics",
+    full: "Politics & Power",
+    blurb:
+      "Reporting a country remade: the July uprising, the fall of Sheikh Hasina, the disappeared, and an election held after seventeen years.",
+    kw: ["election", "awami", "bnp", "jamaat", "hasina", "parliament", "protest", "quota", "uprising", "disappeared", "referendum", "constitution", "july charter", "ncp", "interim government", "tarique", "yunus", "cabinet", "poll", "campaign", "rally", "sedition", "tribunal", "verdict", "coup", "student-led", "voter", "ballot", "politic", "government", "party", "july", "martyr", "evm", "curfew"],
   },
   {
     id: "tech",
     name: "Tech & Digital",
     full: "Tech & the Digital Economy",
     blurb:
-      "The country going online: platform work and the influencer economy, cyber-scams and surveillance, AI, and a digital public square that can build or break a reputation overnight.",
-    kw: ["digital", "internet", "online", "influencer", "creator economy", "youtube", "facebook", "tiktok", "social media", "startup", "e-commerce", "ecommerce", "fintech", "artificial intelligence", " ai ", "cyber", "gig ", "gig economy", "ride-sharing", "ride sharing", "pathao", "freelanc", "outsourc", "smartphone", "mobile phone", "gaming", "gamers", " app ", " apps", "software", "surveillance", "deepfake", "misinformation", "screen time", "broadband", "tech "],
+      "The country going online: platform work and the influencer economy, cyber-scams and surveillance, AI, and a digital public square that can make or break a reputation overnight.",
+    kw: ["digital", "internet", "online", "influencer", "creator economy", "youtube", "facebook", "tiktok", "social media", "startup", "e-commerce", "ecommerce", "fintech", "artificial intelligence", " ai ", "cyber", "gig ", "gig economy", "ride-sharing", "ride sharing", "pathao", "freelanc", "outsourc", "smartphone", "mobile phone", "gaming", "gamers", " app ", " apps", "software", "surveillance", "deepfake", "misinformation", "screen time", "broadband", "tech ", "meta", "data leak", "personal data", "google", "content creation", "content creator", "fm radio", "fact-check", "btrc", "food delivery", "street view"],
+  },
+  {
+    id: "urban",
+    name: "City Life",
+    full: "Cities, Urban Life & Mobility",
+    blurb:
+      "Life in the megacity: traffic and the metro, flyovers and water, liveability, heat and the everyday machinery that keeps Dhaka moving.",
+    kw: ["metro rail", " metro", "traffic", "flyover", "commut", "liveable", "livability", " urban", "footpath", "wasa", "water supply", "waterlog", "transport", "mobility", "housing", "eviction", "slum", "gulshan", "banani", "karwan bazar", "old dhaka", "municipal", "rickshaw", "pedestrian", "city corporation", "fire drill", "fire safety", "eatery", "restaurant", "shopping cent", "metre user", "prepaid", "flat ", "real estate"],
+  },
+  {
+    id: "economy",
+    name: "Economy",
+    full: "Economy & Business",
+    blurb:
+      "The garment floor and the wider economy: wages, exports, inflation, budgets, the businesses that rise and fall, and the people who absorb the shocks first.",
+    kw: ["econom", "inflation", "garment", "rmg", "apparel", "bgmea", "export", "import", "bank", "taka", "forex", "gdp", "trade", "factory", "wage", "union", "industry", "business", "investment", "budget", "adb", "imf", "tax", "revenue", "entrepreneur", "loan", "debt", "market", "tariff", "price", "sme", "stock", "reserve", "subsidy", "fuel", "company", "logistics", "supply chain", "investor", "stimulus", "poverty", "ppp", "exchange rate", "dollar", "zakat"],
   },
   {
     id: "society",
     name: "Society",
     full: "Society & Culture",
     blurb:
-      "The features that carry the texture of Bangladeshi life: faith, football, food, health, heritage, and a one-room school on a river island.",
-    kw: ["film", "movie", "music", "football", "cricket", "sport", "religio", "faith", "festival", "eid", "puja", "hindu", "buddhist", "mosque", "temple", "education", "school", "university", "student", "health", "hospital", "dengue", "medicine", "doctor", "book", "poet", "literature", "food", "cuisine", "recipe", "heritage", "history", "marriage", "wedding", "youth", "art", "tradition", "folk", "family", "travel", "tourism", "language", "museum", "architecture"],
+      "The features that carry the texture of Bangladeshi life: faith and football, food and heritage, and a one-room school on a river island.",
+    kw: ["film", "movie", "music", "football", "cricket", "sport", "religio", "faith", "festival", "eid", "puja", "hindu", "buddhist", "mosque", "temple", "education", "school", "university", "student", "book", "poet", "literature", "food", "cuisine", "recipe", "heritage", "history", "marriage", "wedding", "youth", " art", "tradition", "folk", "family", "travel", "tourism", "language", "museum", "architecture", "mango", "palace", "rajbari"],
   },
+];
+
+// Substring → beat overrides, applied before keyword scoring (first match wins).
+// A quick, editable way to hard-fix a story the classifier gets wrong.
+export const overrides = [
+  ["july generation", "politics"], ["35 july", "politics"], ["july uprising", "politics"], ["martyr", "politics"], ["evm", "politics"],
+  ["aynaghor", "rights"], ["enforced disappear", "rights"], ["journalism", "rights"], ["press freedom", "rights"], ["shipbreaking", "rights"], ["police brutality", "rights"], ["police shotgun", "rights"], ["michael chakma", "rights"],
+  ["covid", "health"], ["coronavirus", "health"], ["pandemic", "health"], ["herd immunity", "health"], ["dengue", "health"], ["nipah", "health"], ["healthcare", "health"],
+  ["gaza", "geopolitics"], ["hamas", "geopolitics"], ["taliban", "geopolitics"], ["pelosi", "geopolitics"], ["imran khan", "geopolitics"], ["amit shah", "geopolitics"], ["modi", "geopolitics"], ["apartheid", "geopolitics"], ["taiwan", "geopolitics"], ["spycraft", "geopolitics"],
+  ["metro rail", "urban"], ["wasa", "urban"],
+  ["brick kiln", "climate"], ["st martin", "climate"],
+  ["miraj sheikh", "rights"], ["searching for my son", "rights"], ["limon has reclaimed", "rights"],
+  ["duty-free car", "politics"], ["pervasive corruption", "politics"], ["bnf:", "politics"],
+  ["get-rich scam", "tech"], ["icg president", "geopolitics"], ["humanitarian safety net", "geopolitics"],
+  ["consumer rights", "economy"], ["paper money", "economy"], ["paid leaves", "economy"],
 ];
 
 // Skills / expertise (from his own site), for the About page.

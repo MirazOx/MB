@@ -2,7 +2,7 @@
 import { writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { site, outlets, publications, beats, articles, awards, fellowships, path as career, facts, posts, expertise, education } from "./data.mjs";
+import { site, outlets, publications, beats, articles, awards, fellowships, path as career, facts, posts, expertise, education, overrides } from "./data.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -24,15 +24,32 @@ const shortOutlet = (pub) => {
 };
 
 // ---- Beat classifier -------------------------------------------------------
-function classifyBeat(text) {
-  const t = (" " + text + " ").toLowerCase();
-  let best = "society", score = 0;
+// Uses (1) explicit overrides, (2) the outlet's own section/URL taxonomy as a
+// strong hint, (3) keyword scoring, with beats-array order breaking ties.
+function sectionHint(section, url) {
+  const sec = (section || "").toLowerCase();
+  if (/startup/.test(sec)) return "tech";
+  if (/economy|world\+biz/.test(sec)) return "economy";
+  if (/health/.test(sec)) return "health";
+  if (/agricultur|earth|habitat|climate|nature/.test(sec)) return "climate";
+  const m = (url || "").match(/dailywaadaa\.com\/([a-z-]+)\//);
+  const cat = m ? m[1] : "";
+  return { "human-rights": "rights", business: "economy", economy: "economy", health: "health", politics: "politics", world: "geopolitics" }[cat] || null;
+}
+function classifyBeat(x) {
+  const title = (typeof x === "string" ? x : x.title) || "";
+  const t = title.toLowerCase();
+  for (const [sub, b] of overrides) if (t.includes(sub)) return b;
+  const s = " " + t + " ";
+  const hint = typeof x === "string" ? null : sectionHint(x.section, x.url);
+  let best = "society", score = -1;
   for (const b of beats) {
-    let s = 0;
-    for (const k of b.kw) if (t.includes(k)) s++;
-    if (s > score) { score = s; best = b.id; }
+    let sc = 0;
+    for (const k of b.kw) if (s.includes(k)) sc++;
+    if (b.id === hint) sc += 1.6;
+    if (sc > score) { score = sc; best = b.id; }
   }
-  return best;
+  return score > 0 ? best : "society";
 }
 
 // ---- Merge scraped + curated into one archive ------------------------------
@@ -49,7 +66,7 @@ for (const a of articles) {
     excerpt: a.excerpt, curated: true, beat: a.beat, laurel: a.laurel,
   });
 }
-const archive = [...archiveMap.values()].map((x) => ({ ...x, beat: x.beat || classifyBeat(x.title + " " + (x.section || "")), rank: rank(x) })).sort((a, b) => b.rank - a.rank);
+const archive = [...archiveMap.values()].map((x) => ({ ...x, beat: x.beat || classifyBeat(x), rank: rank(x) })).sort((a, b) => b.rank - a.rank);
 const outletCounts = {}, beatCounts = {};
 archive.forEach((x) => { outletCounts[x.outlet] = (outletCounts[x.outlet] || 0) + 1; beatCounts[x.beat] = (beatCounts[x.beat] || 0) + 1; });
 const archiveOutlets = Object.keys(outletCounts).sort((a, b) => outletCounts[b] - outletCounts[a]);
@@ -233,7 +250,7 @@ function archiveBlock(items, { withBeat = true } = {}) {
 const logoWeight = {
   "The Business Standard": 3, "The Guardian": 3, "Al Jazeera English": 2.9, "Nikkei Asia": 2.5,
   "South China Morning Post": 2.1, "The Daily Waadaa": 2, "The Diplomat": 1.9, "VICE": 1.9,
-  "Mongabay": 1.6, "Devex": 1.5, "Just-Style": 1.5,
+  "Mongabay": 2.8, "Devex": 1.5, "Just-Style": 1.5,
 };
 function buildIndex() {
   // Largest first so the float reads deliberately.
