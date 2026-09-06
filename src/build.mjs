@@ -340,9 +340,9 @@ function buildFellowships() {
       ${(x.tag || x.year) ? `<span class="fcard-year">${esc(x.tag || x.year)}</span>` : ""}
     </article>`;
   };
-  const strip = [...fellowships, ...awards]
-    .filter((x) => x.logo)
-    .map((x) => `<li class="orgmark reveal"><img src="assets/logos/orgs/${x.logo}" alt="${attr(x.name)}" loading="lazy" onerror="this.style.visibility='hidden'"></li>`)
+  const orgs = [...fellowships, ...awards].filter((x) => x.logo);
+  const strip = [...orgs, ...orgs, ...orgs]
+    .map((x) => `<li class="orgmark"><img src="assets/logos/orgs/${x.logo}" alt="${attr(x.name)}" loading="lazy" onerror="this.style.visibility='hidden'"></li>`)
     .join("");
 
   const body = `
@@ -350,7 +350,7 @@ function buildFellowships() {
   <p class="eyebrow reveal">Fellowships, training &amp; awards</p>
   <h1 class="display reveal d1">The rooms that shaped the reporting.</h1>
   <p class="page-sub reveal d2">From climate journalism at Oxford and a COP30 fellowship in the Amazon to investigative honours at home, the programmes and prizes that sharpened the work.</p>
-  <ul class="orgstrip reveal d3">${strip}</ul>
+  <div class="orgstrip-wrapper reveal d3"><ul class="orgstrip">${strip}</ul></div>
 </div></section>
 
 <section class="sec--tight"><div class="wrap">
