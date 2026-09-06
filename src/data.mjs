@@ -11,6 +11,8 @@ export const site = {
   name: "Masum Billah",
   role: "Journalist",
   location: "Dhaka, Bangladesh",
+  // Deploy base URL (no trailing slash). Used for canonical, OG, sitemap.
+  url: "https://mirazhossain.com/MB",
   title: "Reporter, The Daily Waadaa",
   tagline:
     "Award winning journalist specialized in investigative and long-form reporting.",

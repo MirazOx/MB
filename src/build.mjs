@@ -75,15 +75,27 @@ const archiveYears = [...new Set(archive.map((x) => x.year).filter(Boolean))].so
 const favicon =
   "data:image/svg+xml," +
   encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#1b2430"/><text x="50%" y="52%" dy=".02em" text-anchor="middle" dominant-baseline="middle" font-family="Georgia,serif" font-size="34" fill="#eef2f6">M<tspan fill="#8ab4f8">.</tspan></text></svg>`);
+const _base = (site.url || "").replace(/\/$/, "");
 const jsonLd = {
   "@context": "https://schema.org", "@type": "Person", name: site.name, jobTitle: "Journalist",
-  description: site.tagline, address: { "@type": "PostalAddress", addressLocality: "Dhaka", addressCountry: "BD" },
-  email: "mailto:" + site.contact.email, knowsLanguage: ["English", "Bengali"], alumniOf: education.map((e) => e.org),
+  description: site.tagline, url: _base + "/", image: _base + "/assets/masum-cover.jpg",
+  address: { "@type": "PostalAddress", addressLocality: "Dhaka", addressCountry: "BD" },
+  worksFor: { "@type": "Organization", name: "The Daily Waadaa" },
+  alumniOf: education.map((e) => ({ "@type": "CollegeOrUniversity", name: e.org })),
+  knowsAbout: ["Migration", "Climate change", "Human rights", "Investigative journalism", "Bangladesh politics"],
+  email: "mailto:" + site.contact.email, knowsLanguage: ["English", "Bengali"],
   sameAs: [site.contact.twitter.url, site.contact.linkedin.url, site.contact.tbs.url, site.contact.youtube.url],
 };
 
-function head(title, desc, current) {
+const BASE = (site.url || "").replace(/\/$/, "");
+const canonicalOf = (path) => BASE + "/" + (path === "index.html" ? "" : path);
+const OG_IMAGE = BASE + "/assets/masum-cover.jpg";
+const KEYWORDS = "Masum Billah, journalist Bangladesh, Dhaka reporter, migration, trafficking, climate change, investigative journalism, The Business Standard, The Daily Waadaa, Al Jazeera, human rights, feature writer";
+
+function head(title, desc, current, path = current) {
   const nav = (p, label) => `<a href="${p}"${current === p ? ' aria-current="page"' : ""}>${label}</a>`;
+  const canonical = canonicalOf(path);
+  const isArticleType = /beat-/.test(path);
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -91,10 +103,27 @@ function head(title, desc, current) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${attr(desc)}">
+<meta name="author" content="Masum Billah">
+<meta name="keywords" content="${attr(KEYWORDS)}">
+<meta name="theme-color" content="#f2f4f7">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="${attr(canonical)}">
 <meta property="og:title" content="${attr(title)}">
 <meta property="og:description" content="${attr(desc)}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="${isArticleType ? "article" : "website"}">
+<meta property="og:url" content="${attr(canonical)}">
+<meta property="og:site_name" content="Masum Billah">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="${attr(OG_IMAGE)}">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="855">
+<meta property="og:image:alt" content="Masum Billah, journalist based in Dhaka">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@BillahTalks">
+<meta name="twitter:creator" content="@BillahTalks">
+<meta name="twitter:title" content="${attr(title)}">
+<meta name="twitter:description" content="${attr(desc)}">
+<meta name="twitter:image" content="${attr(OG_IMAGE)}">
 <link rel="icon" href="${favicon}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -362,7 +391,7 @@ function buildBeat(b) {
 ${archiveBlock(items, { withBeat: false })}
 <div class="sec--tight"></div>
 `;
-  return head(`${b.full} · Masum Billah`, `${b.full}: ${b.blurb}`, "work.html") + body + foot();
+  return head(`${b.full} · Masum Billah`, `${b.full}: ${b.blurb}`, "work.html", `beat-${b.id}.html`) + body + foot();
 }
 
 // ===========================================================================
@@ -506,5 +535,21 @@ for (const b of beats) writeFileSync(join(ROOT, `beat-${b.id}.html`), buildBeat(
 writeFileSync(join(ROOT, "fellowships.html"), buildFellowships());
 writeFileSync(join(ROOT, "beyond.html"), buildBeyond());
 writeFileSync(join(ROOT, "about.html"), buildAbout());
-console.log(`Built index, work (${archive.length} rows), ${beats.length} beat pages, fellowships, beyond, about.`);
+// ---- SEO: sitemap.xml + robots.txt ----------------------------------------
+const today = new Date().toISOString().slice(0, 10);
+const pages = ["index.html", "work.html", "about.html", "fellowships.html", "beyond.html", ...beats.map((b) => `beat-${b.id}.html`)];
+const sitemap =
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+  pages
+    .map((p) => {
+      const loc = canonicalOf(p);
+      const pr = p === "index.html" ? "1.0" : p === "work.html" ? "0.9" : "0.7";
+      return `  <url><loc>${loc}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${pr}</priority></url>`;
+    })
+    .join("\n") +
+  `\n</urlset>\n`;
+writeFileSync(join(ROOT, "sitemap.xml"), sitemap);
+writeFileSync(join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${BASE}/sitemap.xml\n`);
+
+console.log(`Built index, work (${archive.length} rows), ${beats.length} beat pages, fellowships, beyond, about, sitemap.xml, robots.txt.`);
 console.log("Beat distribution:", beatCounts);
