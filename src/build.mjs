@@ -94,7 +94,7 @@ function head(title, desc, current) {
     ${nav("fellowships.html", "Credentials")}
     ${nav("beyond.html", "Beyond")}
     ${nav("about.html", "About")}
-    <a class="pill" href="mailto:${site.contact.email}">Get in touch</a>
+    
   </nav>
 </div></header>
 <main id="main">`;
@@ -138,12 +138,15 @@ function foot() {
       <p class="f-eyebrow">Location &amp; local time</p>
       <p class="f-time">Dhaka, Bangladesh &ndash; <span id="clock">...</span></p>
     </div>
-    <nav class="f-socials">
-      <a href="mailto:${attr(c.email)}">${icons.email} email</a>
-      <a href="${attr(c.linkedin.url)}" target="_blank" rel="noopener">${icons.linkedin} linkedin</a>
-      <a href="${attr(c.twitter.url)}" target="_blank" rel="noopener">${icons.twitter} x</a>
-      <a href="${attr(c.youtube.url)}" target="_blank" rel="noopener">${icons.youtube} youtube</a>
-    </nav>
+    <div style="display: flex; flex-direction: column; gap: 1.25rem; align-items: flex-start;">
+      <a href="mailto:${attr(c.email)}" class="btn btn--primary" style="padding: 0.5rem 1.25rem; font-size: 0.85rem;">Get in touch</a>
+      <nav class="f-socials">
+        <a href="mailto:${attr(c.email)}">${icons.email} email</a>
+        <a href="${attr(c.linkedin.url)}" target="_blank" rel="noopener">${icons.linkedin} linkedin</a>
+        <a href="${attr(c.twitter.url)}" target="_blank" rel="noopener">${icons.twitter} twitter</a>
+        <a href="${attr(c.youtube.url)}" target="_blank" rel="noopener">${icons.youtube} youtube</a>
+      </nav>
+    </div>
   </div>
   <div class="f-right">
     <p>&copy; ${year} Masum Billah. All rights reserved.<a href="about.html">About</a></p>
@@ -414,19 +417,24 @@ function buildAbout() {
   const accolades = awards.map((a) => `<li><b>${esc(a.name)}</b><span>${esc(a.year)}</span></li>`).join("");
   const edu = education.map((e) => `<li><b>${esc(e.degree)}</b><span>${esc(e.org)}</span></li>`).join("");
   const c = site.contact;
-  const elsewhere = [
-    `<li><a href="${attr(c.twitter.url)}" target="_blank" rel="noopener">X / Twitter ${arw}</a></li>`,
-    `<li><a href="${attr(c.linkedin.url)}" target="_blank" rel="noopener">LinkedIn ${arw}</a></li>`,
-    `<li><a href="${attr(c.youtube.url)}" target="_blank" rel="noopener">YouTube ${arw}</a></li>`,
-    `<li><a href="mailto:${attr(c.email)}">Email ${arw}</a></li>`,
-  ].join("");
+  const elsewhere = `
+  <div class="contact-card">
+    <h3 style="font-family: var(--display); font-size: 1.35rem; margin-bottom: 0.4rem; color: var(--ink);">Let's talk</h3>
+    <p style="color: var(--ink-soft); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.25rem;">Open to freelance commissions and collaboration on cross-border investigations.</p>
+    <a href="mailto:${attr(c.email)}" class="btn btn--primary" style="display: block; text-align: center; margin-bottom: 1.25rem;">Get in touch</a>
+    <div class="cc-socials" style="display: flex; gap: 1rem; border-top: 1px solid var(--line); padding-top: 1rem; flex-wrap: wrap;">
+      <a href="${attr(c.twitter.url)}" target="_blank" rel="noopener" style="color: var(--ink-muted); text-decoration: none; font-size: 0.8rem; font-weight: 500;">Twitter</a>
+      <a href="${attr(c.linkedin.url)}" target="_blank" rel="noopener" style="color: var(--ink-muted); text-decoration: none; font-size: 0.8rem; font-weight: 500;">LinkedIn</a>
+      <a href="${attr(c.youtube.url)}" target="_blank" rel="noopener" style="color: var(--ink-muted); text-decoration: none; font-size: 0.8rem; font-weight: 500;">YouTube</a>
+    </div>
+  </div>`;
 
   const body = `
 <section class="cover">
   <img class="cover-img" src="assets/masum-cover.jpg" alt="Masum Billah in the Nepal Himalaya" width="1280" height="855">
   <div class="cover-cap">
     <p class="eyebrow">About</p>
-    <h1 class="display">Masum Billah</h1>
+    <h1 class="display">Masum<br>Billah</h1>
     
   </div>
 </section>
@@ -455,8 +463,7 @@ function buildAbout() {
       <ul class="tags"><li>English</li><li>Bengali</li></ul>
     </div>
     <div class="col reveal d2">
-      <h2 class="col-h">Elsewhere</h2>
-      <ul class="linklist">${elsewhere}</ul>
+      ${elsewhere}
     </div>
     <div class="col reveal d3">
       <h2 class="col-h">On the record</h2>

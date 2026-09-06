@@ -791,7 +791,7 @@ a:focus-visible, button:focus-visible {
 
 /* About — wide cover */
 .cover { position: relative; }
-.cover-img { width: 100%; height: clamp(340px, 62vh, 600px); object-fit: cover; object-position: 50% 12%; display: block; }
+.cover-img { width: 100%; height: clamp(400px, 75vh, 850px); object-fit: cover; object-position: 50% 30%; display: block; }
 .cover::after { content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, rgba(17,24,39,0.74), rgba(17,24,39,0.22) 38%, rgba(17,24,39,0) 64%); }
 .cover-cap { position: absolute; left: clamp(1.5rem, 5vw, 4rem); top: clamp(3rem, 6vw, 5rem); z-index: 2; color: #fff; max-width: max-content; }
@@ -801,7 +801,7 @@ a:focus-visible, button:focus-visible {
 
 /* About — body + columns */
 .about-body { padding-block: clamp(2.5rem, 5vw, 4rem); }
-.about-lead { max-width: 64ch; margin: 0 auto clamp(2.25rem, 4.5vw, 3.5rem) auto; text-align: center; }
+.about-lead { max-width: 64ch; margin: 0 auto clamp(2.25rem, 4.5vw, 3.5rem) auto; text-align: justify; }
 .about-lead p { font-family: var(--serif); font-size: clamp(1.12rem, 1rem + 0.6vw, 1.4rem); line-height: 1.55; color: var(--ink); margin-bottom: 1.1rem; }
 .about-lead p:last-child { margin-bottom: 0; }
 .about-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: clamp(1.75rem, 3.5vw, 3rem);
@@ -957,3 +957,12 @@ figure { margin: 0; }
   .fcard { grid-template-columns: auto 1fr; }
   .fcard-year { grid-column: 2; margin-top: 0.3rem; }
 }
+
+.contact-card {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+.cc-socials a:hover { color: var(--ember-ink) !important; }
