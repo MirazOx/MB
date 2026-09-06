@@ -7,15 +7,15 @@
   if (clock) {
     var tick = function () {
       try {
-        var t = new Intl.DateTimeFormat("en-GB", {
+        var t = new Intl.DateTimeFormat("en-US", {
           timeZone: clock.dataset.tz || "Asia/Dhaka",
-          hour: "2-digit",
+          hour: "numeric",
           minute: "2-digit",
-          hour12: false,
+          hour12: true,
         }).format(new Date());
-        clock.textContent = "Dhaka · " + t;
+        clock.textContent = t;
       } catch (e) {
-        clock.textContent = "Dhaka";
+        clock.textContent = "";
       }
     };
     tick();
