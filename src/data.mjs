@@ -31,6 +31,7 @@ export const site = {
 
 // The masthead of outlets that have run his work (with self-hosted logo marks).
 export const outlets = [
+  { name: "Energy Institute", short: "Energy Inst.", logo: "energyinst.png" },
   { name: "The Daily Waadaa", short: "Daily Waadaa", logo: "dailywaadaa.png" },
   { name: "The Guardian", logo: "guardian.png" },
   { name: "Al Jazeera English", short: "Al Jazeera", logo: "aljazeera.png" },
