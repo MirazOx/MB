@@ -11,22 +11,26 @@ export const site = {
   name: "Masum Billah",
   role: "Journalist",
   location: "Dhaka, Bangladesh",
-  // Kept accurate to the public record; adjust freely.
-  title: "Senior feature writer, The Business Standard",
+  title: "Reporter, The Daily Waadaa",
   tagline:
     "Award winning journalist specialized in investigative and long-form reporting.",
-  intro:
-    "I report from Bangladesh on the people caught inside the country's largest forces: the migrant routes that end in trafficking, a coastline losing ground to salt water, and a political order remade by the 2024 uprising. The work is long-form, data-driven, and reported on the ground.",
+  // Bio in his own words (used on the About page).
+  bio: [
+    "I am Masum Billah, an award-winning journalist based in Dhaka, Bangladesh. My work has appeared in The Guardian, Nikkei Asia, Al Jazeera English, VICE, South China Morning Post, The Business Standard, Just Style, and The Diplomat, among others. I also serve as Bangladesh correspondent for International News Services (INS) and independently cover Bangladesh for Nikkei Asia.",
+    "Known for in-depth reporting, long-form features, and investigative journalism, my story “Sold in Cambodia: How Bangladeshis are lured into slavery” was recognised by the Global Investigative Journalism Network as one of Bangladesh's top investigative stories of 2022, and received the 8th BRAC Migration Media Award in 2023.",
+  ],
   contact: {
     email: "masum.engru@gmail.com",
     twitter: { handle: "@BillahTalks", url: "https://twitter.com/BillahTalks" },
-    linkedin: { label: "LinkedIn", url: "https://www.linkedin.com/in/masum-billah-9a6224150" },
-    portfolio: { label: "Story archive", url: "https://sites.google.com/view/billah1/stories" },
+    linkedin: { label: "LinkedIn", url: "https://www.linkedin.com/in/masum-billah-journalist/" },
+    website: { label: "Personal site", url: "https://bit.ly/3LBxljq" },
+    tbs: { label: "The Business Standard", url: "https://www.tbsnews.net/author/masum-billah" },
   },
 };
 
 // The masthead of outlets that have run his work (with self-hosted logo marks).
 export const outlets = [
+  { name: "The Daily Waadaa", short: "Daily Waadaa", logo: "dailywaadaa.png" },
   { name: "The Guardian", logo: "guardian.png" },
   { name: "Al Jazeera English", short: "Al Jazeera", logo: "aljazeera.png" },
   { name: "Nikkei Asia", logo: "nikkei.png" },
@@ -99,6 +103,7 @@ export const articles = [
     url: "https://www.tbsnews.net/features/panorama/trafficked-fight-russia-bangladeshi-victims-recount-harrowing-tales-1062606",
     excerpt:
       "Recruited for factory jobs, young Bangladeshi men found themselves handed a rifle and pushed toward the front line of Russia's war.",
+    featured: true,
   },
   {
     title: "Enslaved in Myanmar's scam centres, rescued Bangladeshis carry harrowing scars",
@@ -127,6 +132,7 @@ export const articles = [
     url: "https://www.tbsnews.net/features/panorama/how-italy-fever-burns-and-builds-madaripur-818671",
     excerpt:
       "A district remade by the dream of Europe: the remittance mansions, the debt, and the bodies lost on the way.",
+    featured: true,
   },
   {
     title: "A migrant kind of love: Inside the long-distance relationships of Bangladesh's migrant workers",
@@ -202,6 +208,7 @@ export const articles = [
     url: "https://www.vice.com/en/article/bvx3k5/two-bangladeshi-brothers-are-trying-to-save-this-dog-from-extinction",
     excerpt:
       "Roughly forty Sarail hounds remain. Two brothers are betting everything on the breed's survival.",
+    featured: true,
   },
   {
     title: "Bangladesh explores wind power",
@@ -443,13 +450,13 @@ export const articles = [
 // Awards & recognition.
 export const awards = [
   {
-    name: "BRAC Migration Media Award",
-    detail: "Two-time recipient, honouring reporting on labour migration.",
-    year: "Two-time winner",
+    name: "8th BRAC Migration Media Award",
+    detail: "Awarded in 2023 for “Sold in Cambodia: How Bangladeshis are lured into slavery.”",
+    year: "2023",
   },
   {
     name: "Global Investigative Journalism Network",
-    detail: "“Sold in Cambodia” named among the best investigations of the year.",
+    detail: "“Sold in Cambodia” recognised as one of Bangladesh's top investigative stories of 2022.",
     year: "2022",
   },
 ];
@@ -457,8 +464,17 @@ export const awards = [
 // Fellowships & training — the rooms that shaped the reporting.
 export const fellowships = [
   {
+    name: "Climate Change Media Partnership Fellow, COP30",
+    org: "Earth Journalism Network & the Stanley Center for Peace and Security · Belém, Brazil",
+    tag: "2025",
+  },
+  {
+    name: "National Press Foundation Fellow",
+    org: "International Trade Training for Journalists",
+  },
+  {
     name: "Oxford Climate Journalism Network",
-    org: "Reuters Institute for the Study of Journalism, University of Oxford",
+    org: "Member · Reuters Institute for the Study of Journalism, University of Oxford",
   },
   {
     name: "Earth Journalism Network Fellow",
@@ -477,21 +493,45 @@ export const fellowships = [
 // Short professional arc for the About page.
 export const path = [
   {
-    role: "Senior feature writer",
-    org: "The Business Standard",
-    note: "Long-form and investigative features on migration, climate, labour, and politics.",
+    role: "Reporter",
+    org: "The Daily Waadaa",
+    note: "Reporting on politics, migration, climate, and society for one of Bangladesh's newer newsrooms.",
   },
   {
-    role: "International contributor",
-    org: "The Guardian · Al Jazeera · Nikkei Asia · SCMP · Mongabay · Devex",
-    note: "Reporting Bangladesh for global audiences, from the 2024 uprising to the changing monsoon.",
+    role: "Bangladesh correspondent",
+    org: "International News Services (INS) · Nikkei Asia (independent)",
+    note: "Covering Bangladesh for international wires and business press.",
+  },
+  {
+    role: "Senior feature writer (former)",
+    org: "The Business Standard",
+    note: "Hundreds of long-form and investigative features on migration, climate, labour, and politics.",
   },
 ];
 
 // Reporting reach, stated plainly for the About page.
 export const facts = [
-  { figure: "10", label: "international mastheads" },
-  { figure: "6–10 yrs", label: "reporting experience" },
+  { figure: "11", label: "newsrooms published in" },
+  { figure: "400+", label: "published stories" },
   { figure: "2×", label: "BRAC Migration Media Award" },
   { figure: "EN / BN", label: "reporting languages" },
+];
+
+// "Beyond" — short notes, quick blogs, anything he wants to share.
+// Add an entry here and re-run `node src/build.mjs`.
+export const posts = [
+  {
+    title: "Why I keep returning to the migrant trail",
+    date: "2026-02-10",
+    kind: "Note",
+    body:
+      "Every few months a new route opens, or an old one turns deadlier. The names change, the brokers change, but the arithmetic of hope and debt stays the same. This is where I keep coming back.",
+  },
+  {
+    title: "Notes from COP30, Belém",
+    date: "2025-11-18",
+    kind: "Dispatch",
+    body:
+      "Reporting the climate summit from the edge of the Amazon, thinking the whole time about a delta 15,000km away that will live or die by what is decided in rooms like these.",
+  },
 ];

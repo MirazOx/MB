@@ -607,3 +607,67 @@ a:focus-visible, button:focus-visible {
 .story-meta .pub, .story .st-meta .pub { font-family: var(--serif); letter-spacing: 0; }
 /* figcaption caption text isn't uppercase — normal case, mono */
 .about-portrait figcaption { text-transform: none; font-style: normal; }
+
+/* =========================================================================
+   v2 additions: Home button, impactful lead, fellowships, beyond
+   ========================================================================= */
+
+/* Masthead — name removed, Home button on the left */
+.masthead .wrap { align-items: center; }
+.home {
+  display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;
+  font-family: var(--mono); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink); padding: 0.3rem 0;
+}
+.home-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ember); transition: transform 0.3s var(--ease); }
+.home:hover .home-dot { transform: scale(1.35); }
+.home.is-current .home-dot { box-shadow: 0 0 0 3px var(--ember-wash); }
+
+/* Impactful lead (Work page) */
+.impactful { padding-block: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 4vw, 3.25rem); }
+.impactful .lead { display: block; grid-template-columns: none; border-bottom: 1px solid var(--line);
+  padding-bottom: clamp(1.75rem, 3vw, 2.75rem); margin-bottom: clamp(0.5rem, 1.5vw, 1rem); }
+.impactful .lead a.story-link { display: grid; grid-template-columns: minmax(0, 1.15fr) 1fr;
+  gap: clamp(1.25rem, 3.5vw, 3rem); align-items: center; text-decoration: none; color: inherit; }
+@media (max-width: 760px) { .impactful .lead a.story-link { grid-template-columns: 1fr; gap: 1.25rem; } }
+.lead-media .thumb { display: block; width: 100%; aspect-ratio: 16 / 10; border-radius: 12px; }
+.lead-media .thumb img { filter: saturate(0.98); }
+.impactful .lead a.story-link:hover .thumb img { transform: scale(1.03); }
+.lead-copy .laurel { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem;
+  font-family: var(--mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ember-ink); }
+.lead-copy .laurel::before { content: "\2605"; font-size: 0.85em; }
+.lead-copy .st-top { margin-bottom: 0.55rem; }
+.lead-copy h3 { font-family: var(--display); font-size: clamp(1.6rem, 1.2rem + 1.8vw, 2.4rem);
+  line-height: 1.08; letter-spacing: -0.018em; margin-bottom: 0.9rem; transition: color 0.3s var(--ease); }
+.impactful .lead a.story-link:hover h3 { color: var(--ember-ink); }
+.lead-copy .excerpt { color: var(--ink-soft); font-size: 1.02rem; line-height: 1.55; max-width: 52ch; margin-bottom: 1rem; }
+.lead-copy .read { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--mono);
+  font-size: 0.76rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink); }
+.impactful .lead a.story-link:hover .read { color: var(--ember-ink); }
+.read .arw { transition: transform 0.3s var(--ease); }
+.impactful .lead a.story-link:hover .read .arw { transform: translate(3px, -3px); }
+
+/* the other impactful pieces: two columns on wide screens */
+@media (min-width: 900px) { .impactful-rest { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(2rem, 4vw, 3.5rem); } }
+
+/* Full archive heading */
+.archive-full { padding-top: clamp(1.5rem, 3vw, 2.5rem); }
+.archive-full .sec-head { display: block; margin-bottom: 0.5rem; }
+.archive-full .sec-head h2 { font-family: var(--display); font-size: var(--h2); letter-spacing: -0.015em; }
+.archive-full .sec-head .page-sub { margin-top: 0.5rem; }
+
+/* Fellowships page */
+.creds-single { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4.5rem); }
+@media (max-width: 760px) { .creds-single { grid-template-columns: 1fr; gap: 2.5rem; } }
+.sec-label { font-size: var(--h3); margin-bottom: 1.25rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--line-2); }
+.cred-list .cred { padding-block: 1.1rem; border-bottom: 1px solid var(--line); position: relative; }
+
+/* Beyond page */
+.notes { max-width: 46rem; }
+.note { padding-block: clamp(1.5rem, 3vw, 2.25rem); border-bottom: 1px solid var(--line); }
+.note-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem;
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.note-kind { color: var(--ember-ink); font-weight: 600; }
+.note h2 { font-family: var(--display); font-size: var(--h3); letter-spacing: -0.01em; margin-bottom: 0.6rem; }
+.note p { color: var(--ink-soft); line-height: 1.65; max-width: 60ch; }
+.empty { color: var(--ink-muted); font-family: var(--serif); font-style: italic; padding: 3rem 0; }

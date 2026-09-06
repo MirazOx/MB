@@ -31,7 +31,7 @@ const decode = (s = "") =>
 function scrapeTBS() {
   const items = [];
   const seen = new Set();
-  for (let page = 0; page <= 30; page++) {
+  for (let page = 0; page <= 80; page++) {
     const url = "https://www.tbsnews.net/author/masum-billah" + (page ? "?page=" + page : "");
     const html = get(url);
     if (!html) break;

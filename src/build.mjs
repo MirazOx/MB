@@ -1,56 +1,56 @@
-// Build the static site from src/data.mjs → index.html, work.html, about.html,
-// archive.html. Run: node src/build.mjs
-import { writeFileSync, readFileSync, existsSync } from "node:fs";
+// Build the static site. Run: node src/build.mjs
+import { writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { site, outlets, publications, beats, articles, awards, fellowships, path as career, facts } from "./data.mjs";
+import { site, outlets, publications, articles, awards, fellowships, path as career, facts, posts } from "./data.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
-const banners = existsSync(join(HERE, "banners.json"))
-  ? JSON.parse(readFileSync(join(HERE, "banners.json"), "utf8"))
-  : {};
+const readJSON = (f) => (existsSync(join(HERE, f)) ? JSON.parse(readFileSync(join(HERE, f), "utf8")) : {});
+const banners = readJSON("banners.json");          // curated url -> local file
+const scraped = existsSync(join(HERE, "scraped.json")) ? JSON.parse(readFileSync(join(HERE, "scraped.json"), "utf8")) : [];
 
 const esc = (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const attr = (s = "") => esc(s).replace(/"/g, "&quot;");
 const arw = '<span class="arw" aria-hidden="true">↗</span>';
 const arwR = '<span class="arw" aria-hidden="true">→</span>';
 
-const beatName = (id) => beats.find((b) => b.id === id)?.name ?? id;
-const beatIndex = (id) => String(beats.findIndex((b) => b.id === id) + 1).padStart(2, "0");
-const byYear = (x, y) => Number(y.year) - Number(x.year);
-const inBeat = (id) => articles.filter((a) => a.beat === id).sort(byYear);
-// Highlights per beat: featured first, then newest, capped.
-const highlightsFor = (id, n = 4) => {
-  const list = inBeat(id);
-  return [...list.filter((a) => a.featured), ...list.filter((a) => !a.featured)].slice(0, n);
-};
-const featured = articles.filter((a) => a.featured);
-
 const shortOutlet = (pub) => {
   const o = outlets.find((x) => x.name === pub);
   if (o?.short) return o.short;
-  return (
-    { "The Business Standard": "TBS", "South China Morning Post": "SCMP", "Al Jazeera English": "Al Jazeera", "Energy Institute": "Energy Inst." }[pub] || pub
-  );
+  return { "The Business Standard": "TBS", "South China Morning Post": "SCMP", "Al Jazeera English": "Al Jazeera", "Energy Institute": "Energy Inst." }[pub] || pub;
 };
+const featured = articles.filter((a) => a.featured);
+
+// ---- Merge scraped + curated into one archive ------------------------------
+const rank = (x) => (x.year ? Number(x.year) + 0.5 : x.id ? 2020 + (x.id - 35591) / 221000 : 0);
+const archiveMap = new Map();
+for (const s of scraped) archiveMap.set(s.url, { url: s.url, title: s.title, outlet: s.outlet, image: s.image, section: s.section || null, id: s.id, year: s.year || null });
+for (const a of articles) {
+  const ex = archiveMap.get(a.url) || {};
+  archiveMap.set(a.url, {
+    url: a.url, title: a.title, outlet: a.publication,
+    image: banners[a.url] || ex.image || null,
+    year: a.year || ex.year || null, section: ex.section || null, id: ex.id || null,
+    excerpt: a.excerpt, curated: true,
+  });
+}
+const archive = [...archiveMap.values()].map((x) => ({ ...x, rank: rank(x) })).sort((a, b) => b.rank - a.rank);
+const outletCounts = {};
+archive.forEach((x) => { outletCounts[x.outlet] = (outletCounts[x.outlet] || 0) + 1; });
+const archiveOutlets = Object.keys(outletCounts).sort((a, b) => outletCounts[b] - outletCounts[a]);
+const archiveYears = [...new Set(archive.map((x) => x.year).filter(Boolean))].sort().reverse();
 
 const favicon =
   "data:image/svg+xml," +
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#1b2430"/><text x="50%" y="52%" dy=".02em" text-anchor="middle" dominant-baseline="middle" font-family="Georgia,serif" font-size="34" fill="#eef2f6">M<tspan fill="#8ab4f8">.</tspan></text></svg>`
   );
-
 const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: site.name,
-  jobTitle: "Journalist",
-  description: site.tagline,
-  address: { "@type": "PostalAddress", addressLocality: "Dhaka", addressCountry: "BD" },
-  email: "mailto:" + site.contact.email,
-  knowsLanguage: ["English", "Bengali"],
-  sameAs: [site.contact.twitter.url, site.contact.linkedin.url, site.contact.portfolio.url],
+  "@context": "https://schema.org", "@type": "Person", name: site.name, jobTitle: "Journalist",
+  description: site.tagline, address: { "@type": "PostalAddress", addressLocality: "Dhaka", addressCountry: "BD" },
+  email: "mailto:" + site.contact.email, knowsLanguage: ["English", "Bengali"],
+  sameAs: [site.contact.twitter.url, site.contact.linkedin.url, site.contact.website.url],
 };
 
 function head(title, desc, current) {
@@ -75,14 +75,12 @@ function head(title, desc, current) {
 </head>
 <body>
 <a href="#main" class="skip">Skip to content</a>
-<div class="topline"><div class="wrap">
-  <span>${esc(site.title)}</span>
-  <span class="live"><span id="clock" data-tz="Asia/Dhaka">Dhaka</span></span>
-</div></div>
 <header class="masthead"><div class="wrap">
-  <a class="wordmark" href="index.html"><b>Masum Billah</b><small>Journalist</small></a>
+  <a class="home${current === "index.html" ? " is-current" : ""}" href="index.html"><span class="home-dot" aria-hidden="true"></span>Home</a>
   <nav class="nav">
     ${nav("work.html", "Work")}
+    ${nav("fellowships.html", "Fellowships")}
+    ${nav("beyond.html", "Beyond")}
     ${nav("about.html", "About")}
     <a class="pill" href="about.html#contact">Get in touch</a>
   </nav>
@@ -103,7 +101,7 @@ function contactBand() {
       ${chan("Email", c.email, "mailto:" + c.email, false)}
       ${chan("X / Twitter", c.twitter.handle, c.twitter.url)}
       ${chan("LinkedIn", "Masum Billah", c.linkedin.url)}
-      ${chan("Story archive", "All published work", c.portfolio.url)}
+      ${chan("Personal site", "bit.ly/3LBxljq", c.website.url)}
     </div>
     <p class="tipnote">Working on something sensitive? Email first and we can arrange an encrypted channel before you share anything.</p>
   </div>
@@ -117,10 +115,10 @@ function foot() {
   <span class="fm">Masum Billah</span>
   <nav>
     <a href="work.html">Work</a>
-    <a href="archive.html">Archive</a>
+    <a href="fellowships.html">Fellowships</a>
+    <a href="beyond.html">Beyond</a>
     <a href="about.html">About</a>
     <a href="${site.contact.twitter.url}" target="_blank" rel="noopener">X</a>
-    <a href="${site.contact.linkedin.url}" target="_blank" rel="noopener">LinkedIn</a>
   </nav>
   <small>© ${year} Masum Billah · Dhaka</small>
 </div></footer>
@@ -129,29 +127,22 @@ function foot() {
 </html>`;
 }
 
-// --- Banner thumbnail -------------------------------------------------------
-function thumb(a) {
-  const src = banners[a.url];
-  const fb = `<span class="thumb-fb"${src ? " hidden" : ""}>${esc(shortOutlet(a.publication))}</span>`;
-  const img = src
-    ? `<img src="${attr(src)}" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">`
+// --- thumbnail + rows -------------------------------------------------------
+function thumb(image, outlet) {
+  const fb = `<span class="thumb-fb"${image ? " hidden" : ""}>${esc(shortOutlet(outlet))}</span>`;
+  const img = image
+    ? `<img src="${attr(image)}" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">`
     : "";
-  return `<span class="thumb" data-beat="${a.beat}">${img}${fb}</span>`;
+  return `<span class="thumb">${img}${fb}</span>`;
 }
-
-// --- Story row (with banner) ------------------------------------------------
-function storyRow(a, { showBeat = false, excerpt = true } = {}) {
-  return `<li class="story" data-beat="${a.beat}" data-year="${esc(a.year)}" data-outlet="${attr(a.publication)}" data-title="${attr(a.title.toLowerCase())}">
-  <a href="${attr(a.url)}" target="_blank" rel="noopener">
-    ${thumb(a)}
+function archiveRow(x) {
+  const meta = x.year || x.section || "";
+  return `<li class="story" data-outlet="${attr(x.outlet)}" data-title="${attr(x.title.toLowerCase())}" data-year="${attr(x.year || "")}">
+  <a href="${attr(x.url)}" target="_blank" rel="noopener">
+    ${thumb(x.image, x.outlet)}
     <span class="st-body">
-      <span class="st-top">
-        <span class="pub">${esc(a.publication)}</span>
-        <span class="yr">${esc(a.year)}</span>
-      </span>
-      <h4>${esc(a.title)}</h4>
-      ${excerpt ? `<p class="st-ex">${esc(a.excerpt)}</p>` : ""}
-      ${showBeat ? `<span class="st-tag">${esc(beatName(a.beat))}</span>` : ""}
+      <span class="st-top"><span class="pub">${esc(x.outlet)}</span><span class="yr">${esc(meta)}</span></span>
+      <h4>${esc(x.title)}</h4>
     </span>
     ${arw}
   </a>
@@ -163,18 +154,16 @@ function storyRow(a, { showBeat = false, excerpt = true } = {}) {
 // ===========================================================================
 function buildIndex() {
   const logos = outlets
-    .map(
-      (o) => `<li class="logo reveal">
+    .map((o) => `<li class="logo reveal">
       <img src="assets/logos/${o.logo}" alt="${attr(o.name)} logo" loading="lazy" onerror="this.style.visibility='hidden'">
       <span>${esc(o.name)}</span>
-    </li>`
-    )
+    </li>`)
     .join("\n");
 
   const body = `
 <section class="banner"><div class="wrap banner-grid">
   <div class="banner-copy">
-    <p class="eyebrow reveal">Journalist <span class="dot">·</span> Dhaka, Bangladesh</p>
+    <p class="eyebrow reveal">${esc(site.title)}</p>
     <h1 class="reveal d1">Masum<br><span class="ln2">Billah</span></h1>
     <p class="banner-sub reveal d2">${esc(site.tagline)}</p>
     <a class="btn btn--lg reveal d3" href="work.html">See my work ${arwR}</a>
@@ -185,10 +174,7 @@ function buildIndex() {
 </div></section>
 
 <section class="appeared"><div class="wrap">
-  <div class="appeared-head reveal">
-    <p class="eyebrow">Work appeared in</p>
-    <p class="appeared-sub">National and international reporting across ${outlets.length} newsrooms.</p>
-  </div>
+  <div class="appeared-head reveal"><p class="eyebrow">Work appeared in</p></div>
   <ul class="logos">${logos}</ul>
 </div></section>
 `;
@@ -196,87 +182,63 @@ function buildIndex() {
 }
 
 // ===========================================================================
-// WORK — highlighted work by beat, then a button to the full archive
+// WORK — most impactful up top, then the full archive
 // ===========================================================================
 function buildWork() {
-  const chips =
-    `<button class="chip" data-filter="all" aria-pressed="true">All beats</button>` +
-    beats
-      .map((b) => `<button class="chip" data-filter="${b.id}" aria-pressed="false">${esc(b.name)}</button>`)
-      .join("");
-
-  const sections = beats
-    .map((b) => {
-      const picks = highlightsFor(b.id, 4);
-      const total = inBeat(b.id).length;
-      const more =
-        total > picks.length
-          ? `<a class="beat-more" href="archive.html#${b.id}">${total - picks.length} more in the archive ${arwR}</a>`
-          : "";
-      const list = picks.map((a) => storyRow(a, { excerpt: true })).join("\n");
-      return `<section class="beat-sec" id="${b.id}" data-beat="${b.id}">
-  <div class="beat-head reveal">
-    <span class="bnum">${beatIndex(b.id)}</span>
-    <h2 class="display">${esc(b.name)}</h2>
-    <p>${esc(b.blurb)}</p>
-    <span class="bcount">${total} ${total === 1 ? "story" : "stories"}</span>
-  </div>
-  <ul class="stories">${list}</ul>
-  ${more}
-</section>`;
-    })
+  const lead = featured[0];
+  const rest = featured.slice(1);
+  const leadImg = banners[lead.url] || null;
+  const restRows = rest
+    .map((a) => `<li class="story" data-outlet="${attr(a.publication)}" data-title="${attr(a.title.toLowerCase())}">
+      <a href="${attr(a.url)}" target="_blank" rel="noopener">
+        ${thumb(banners[a.url] || null, a.publication)}
+        <span class="st-body">
+          <span class="st-top"><span class="pub">${esc(a.publication)}</span><span class="yr">${esc(a.year)}</span></span>
+          <h4>${esc(a.title)}</h4>
+          <p class="st-ex">${esc(a.excerpt)}</p>
+        </span>
+        ${arw}
+      </a>
+    </li>`)
     .join("\n");
+
+  const outletOpts = archiveOutlets.map((o) => `<option value="${attr(o)}">${esc(o)} (${outletCounts[o]})</option>`).join("");
+  const yearOpts = archiveYears.map((y) => `<option value="${esc(y)}">${esc(y)}</option>`).join("");
+  const rows = archive.map(archiveRow).join("\n");
 
   const body = `
 <section class="page-head"><div class="wrap">
   <p class="eyebrow reveal">Selected work</p>
   <h1 class="display reveal d1">The work I'm proudest of.</h1>
-  <p class="page-sub reveal d2">Highlights by beat, from a decade reporting Bangladesh. Each headline opens the original at its publication.</p>
+  <p class="page-sub reveal d2">A handful of the stories that mattered most, then the full archive of everything below.</p>
 </div></section>
 
-<div class="filterbar"><div class="wrap"><div class="chips" role="group" aria-label="Filter beats">${chips}</div></div></div>
+<section class="impactful"><div class="wrap">
+  <article class="lead reveal">
+    <a class="story-link" href="${attr(lead.url)}" target="_blank" rel="noopener">
+      <span class="lead-media">${thumb(leadImg, lead.publication)}</span>
+      <span class="lead-copy">
+        ${lead.laurel ? `<span class="laurel">${esc(lead.laurel)}</span>` : ""}
+        <span class="st-top"><span class="pub">${esc(lead.publication)}</span><span class="yr">${esc(lead.year)}</span></span>
+        <h3>${esc(lead.title)}</h3>
+        <p class="excerpt">${esc(lead.excerpt)}</p>
+        <span class="read">Read the investigation ${arw}</span>
+      </span>
+    </a>
+  </article>
+  <ul class="stories impactful-rest">${restRows}</ul>
+</div></section>
 
-<div class="wrap" id="beats">
-  ${sections}
-</div>
-
-<section class="archive-cta"><div class="wrap reveal">
-  <div>
-    <h2 class="display">Looking for everything?</h2>
-    <p>Every published piece, searchable by outlet, beat, and year.</p>
+<section class="archive-full"><div class="wrap">
+  <div class="sec-head reveal">
+    <h2 class="display">The full archive</h2>
+    <p class="page-sub">Everything published, ${archive.length} pieces and counting. Search, or filter by outlet and year.</p>
   </div>
-  <a class="btn btn--lg" href="archive.html">See all ${articles.length} pieces ${arwR}</a>
-</div></section>
-`;
-  return head("Work · Masum Billah", "Selected work by Masum Billah, filed by beat: migration and trafficking, climate, politics, labour, and society.", "work.html") + body + foot();
-}
-
-// ===========================================================================
-// ARCHIVE — full, searchable, filterable (not in the top nav)
-// ===========================================================================
-function buildArchive() {
-  const all = [...articles].sort(byYear);
-  const years = [...new Set(articles.map((a) => a.year))].sort().reverse();
-  const outletNames = [...new Set(articles.map((a) => a.publication))].sort();
-
-  const beatOpts = beats.map((b) => `<option value="${b.id}">${esc(b.name)}</option>`).join("");
-  const outletOpts = outletNames.map((o) => `<option value="${attr(o)}">${esc(o)}</option>`).join("");
-  const yearOpts = years.map((y) => `<option value="${esc(y)}">${esc(y)}</option>`).join("");
-
-  const rows = all.map((a) => storyRow(a, { showBeat: true, excerpt: false })).join("\n");
-
-  const body = `
-<section class="page-head"><div class="wrap">
-  <p class="eyebrow reveal"><a href="work.html" class="back">${"←"} Selected work</a></p>
-  <h1 class="display reveal d1">The full archive.</h1>
-  <p class="page-sub reveal d2">Every piece in this portfolio, ${articles.length} in all. Search by title or outlet, filter by beat, outlet and year, and sort by date.</p>
-</div></section>
-
+</div>
 <div class="filterbar filterbar--archive"><div class="wrap">
   <div class="controls">
     <input type="search" id="q" class="search" placeholder="Search titles or outlets…" aria-label="Search stories" autocomplete="off">
-    <select id="f-beat" aria-label="Filter by beat"><option value="">All beats</option>${beatOpts}</select>
-    <select id="f-outlet" aria-label="Filter by outlet"><option value="">All outlets</option>${outletOpts}</select>
+    <select id="f-outlet" aria-label="Filter by outlet"><option value="">All outlets (${archive.length})</option>${outletOpts}</select>
     <select id="f-year" aria-label="Filter by year"><option value="">All years</option>${yearOpts}</select>
     <select id="f-sort" aria-label="Sort order">
       <option value="new">Newest first</option>
@@ -284,34 +246,88 @@ function buildArchive() {
       <option value="az">Title A–Z</option>
     </select>
   </div>
-  <p class="count" id="count" aria-live="polite">Showing ${all.length} of ${all.length} pieces</p>
+  <p class="count" id="count" aria-live="polite">Showing ${archive.length} of ${archive.length} pieces</p>
 </div></div>
-
 <div class="wrap">
   <ul class="stories archive-list" id="archive-list">${rows}</ul>
   <p class="no-results is-hidden" id="no-results">No pieces match those filters.</p>
 </div>
 <div class="sec--tight"></div>
 `;
-  return head("Archive · Masum Billah", "The complete, searchable archive of Masum Billah's published journalism.", "archive.html") + body + foot();
+  return head("Work · Masum Billah", "Selected and complete work by Masum Billah: investigative and long-form reporting from Bangladesh, published across " + archiveOutlets.length + " newsrooms.", "work.html") + body + foot();
+}
+
+// ===========================================================================
+// FELLOWSHIPS / TRAINING
+// ===========================================================================
+function buildFellowships() {
+  const fellowList = fellowships
+    .map((f) => `<li class="cred reveal"><div class="cname">${esc(f.name)}</div><div class="cmeta">${esc(f.org)}</div>${f.tag ? `<span class="cyear">${esc(f.tag)}</span>` : ""}</li>`)
+    .join("\n");
+  const awardList = awards
+    .map((a) => `<li class="cred reveal"><div class="cname">${esc(a.name)}</div><div class="cmeta">${esc(a.detail)}</div><span class="cyear">${esc(a.year)}</span></li>`)
+    .join("\n");
+
+  const body = `
+<section class="page-head"><div class="wrap">
+  <p class="eyebrow reveal">Fellowships &amp; training</p>
+  <h1 class="display reveal d1">The rooms that shaped the reporting.</h1>
+  <p class="page-sub reveal d2">Fellowships, newsroom training, and recognition, from climate journalism at Oxford and COP30 to investigative honours at home.</p>
+</div></section>
+
+<section class="sec--tight"><div class="wrap creds-single">
+  <div>
+    <h2 class="display sec-label reveal">Fellowships &amp; programmes</h2>
+    <ul class="cred-list">${fellowList}</ul>
+  </div>
+  <div>
+    <h2 class="display sec-label reveal">Awards &amp; recognition</h2>
+    <ul class="cred-list">${awardList}</ul>
+  </div>
+</div></section>
+`;
+  return head("Fellowships & Training · Masum Billah", "Fellowships, training and awards: Oxford Climate Journalism Network, National Press Foundation, CCMP COP30, Earth Journalism Network, and the BRAC Migration Media Award.", "fellowships.html") + body + foot();
+}
+
+// ===========================================================================
+// BEYOND — notes / quick blogs
+// ===========================================================================
+function buildBeyond() {
+  const list = posts.length
+    ? posts
+        .map((p) => {
+          const d = new Date(p.date);
+          const ds = isNaN(d) ? p.date : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+          return `<article class="note reveal">
+      <div class="note-meta"><span class="note-kind">${esc(p.kind || "Note")}</span><time>${esc(ds)}</time></div>
+      <h2 class="display">${esc(p.title)}</h2>
+      <p>${esc(p.body)}</p>
+    </article>`;
+        })
+        .join("\n")
+    : `<p class="empty">Nothing here yet. Check back soon.</p>`;
+
+  const body = `
+<section class="page-head"><div class="wrap">
+  <p class="eyebrow reveal">Beyond the byline</p>
+  <h1 class="display reveal d1">Beyond.</h1>
+  <p class="page-sub reveal d2">Notes, half-formed thoughts, and things worth sharing that never make it into a filed story.</p>
+</div></section>
+
+<section class="sec--tight"><div class="wrap notes">${list}</div></section>
+`;
+  return head("Beyond · Masum Billah", "Notes, quick blogs, and thoughts from journalist Masum Billah.", "beyond.html") + body + foot();
 }
 
 // ===========================================================================
 // ABOUT
 // ===========================================================================
 function buildAbout() {
-  const ledger = facts
-    .map((f) => `<div><span class="figure">${esc(f.figure)}</span><span class="flabel">${esc(f.label)}</span></div>`)
-    .join("");
-  const awardList = awards
-    .map((a) => `<li><div class="cname">${esc(a.name)}</div><div class="cmeta">${esc(a.detail)}</div><span class="cyear">${esc(a.year)}</span></li>`)
-    .join("\n");
-  const fellowList = fellowships
-    .map((f) => `<li><div class="cname">${esc(f.name)}</div><div class="cmeta">${esc(f.org)}</div></li>`)
-    .join("\n");
+  const ledger = facts.map((f) => `<div><span class="figure">${esc(f.figure)}</span><span class="flabel">${esc(f.label)}</span></div>`).join("");
   const careerList = career
     .map((c) => `<li><div class="cname">${esc(c.role)} <span style="color:var(--ink-muted)">· ${esc(c.org)}</span></div><div class="cmeta">${esc(c.note)}</div></li>`)
     .join("\n");
+  const bioParas = site.bio.map((p) => `<p>${esc(p)}</p>`).join("\n        ");
 
   const body = `
 <section class="about-hero"><div class="wrap">
@@ -320,10 +336,9 @@ function buildAbout() {
       <p class="eyebrow reveal">About</p>
       <h1 class="reveal d1" style="margin-top:1rem">A reporter on migration, climate, and <em>power</em> in Bangladesh.</h1>
       <div class="reveal d2">
-        <p>Masum Billah is a Dhaka-based journalist and senior feature writer at The Business Standard, reporting the forces that reshape ordinary Bangladeshi lives.</p>
-        <p>His investigations have followed workers trafficked to Cambodia's scam compounds and to the front lines of Russia's war, traced a coastline losing ground to salt water, and documented the fall of Sheikh Hasina and the uprising that unseated her. He works in long-form and data: a feature on the changing monsoon drew on three decades of rainfall records.</p>
-        <p>The reporting has run in ${esc(publications.slice(0, 4).join(", "))}, and beyond, and has been recognised twice by the BRAC Migration Media Award and picked by the Global Investigative Journalism Network among the year's best.</p>
+        ${bioParas}
       </div>
+      <a class="link-more reveal d3" href="fellowships.html" style="margin-top:1.5rem;display:inline-flex">Fellowships &amp; awards ${arwR}</a>
     </div>
     <figure class="about-portrait reveal d2">
       <div class="frame"><img src="assets/masum-billah.png" alt="Portrait of Masum Billah" width="1024" height="577"></div>
@@ -332,24 +347,9 @@ function buildAbout() {
   </div>
 </div></section>
 
-<section class="sec--tight"><div class="wrap">
-  <div class="ledger reveal">${ledger}</div>
-</div></section>
+<section class="sec--tight"><div class="wrap"><div class="ledger reveal">${ledger}</div></div></section>
 
 <section class="sec--tight"><div class="wrap">
-  <div class="creds">
-    <div class="reveal">
-      <h2 class="display">Awards &amp; recognition</h2>
-      <ul class="cred-list">${awardList}</ul>
-    </div>
-    <div class="reveal d1">
-      <h2 class="display">Fellowships &amp; training</h2>
-      <ul class="cred-list">${fellowList}</ul>
-    </div>
-  </div>
-</div></section>
-
-<section class="sec--tight" style="border-top:1px solid var(--line)"><div class="wrap">
   <div class="creds">
     <div class="reveal">
       <h2 class="display">On the record</h2>
@@ -364,11 +364,15 @@ function buildAbout() {
   </div>
 </div></section>
 `;
-  return head("About · Masum Billah", "Masum Billah is a Dhaka-based journalist and senior feature writer at The Business Standard, twice awarded the BRAC Migration Media Award.", "about.html") + body + foot();
+  return head("About · Masum Billah", "Masum Billah is a Dhaka-based journalist, reporter at The Daily Waadaa and Bangladesh correspondent for INS, twice recognised for his migration reporting.", "about.html") + body + foot();
 }
+
+// old archive page no longer used
+try { rmSync(join(ROOT, "archive.html")); } catch {}
 
 writeFileSync(join(ROOT, "index.html"), buildIndex());
 writeFileSync(join(ROOT, "work.html"), buildWork());
-writeFileSync(join(ROOT, "archive.html"), buildArchive());
+writeFileSync(join(ROOT, "fellowships.html"), buildFellowships());
+writeFileSync(join(ROOT, "beyond.html"), buildBeyond());
 writeFileSync(join(ROOT, "about.html"), buildAbout());
-console.log("Built index.html, work.html, archive.html, about.html");
+console.log(`Built index, work (${archive.length} archive rows), fellowships, beyond, about.`);
