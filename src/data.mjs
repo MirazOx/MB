@@ -14,16 +14,17 @@ export const site = {
   title: "Reporter, The Daily Waadaa",
   tagline:
     "Award winning journalist specialized in investigative and long-form reporting.",
-  // Bio in his own words (used on the About page).
+  // Bio (literary register; he read English before he read the news).
   bio: [
-    "I am Masum Billah, an award-winning journalist based in Dhaka, Bangladesh. My work has appeared in The Guardian, Nikkei Asia, Al Jazeera English, VICE, South China Morning Post, The Business Standard, Just Style, and The Diplomat, among others. I also serve as Bangladesh correspondent for International News Services (INS) and independently cover Bangladesh for Nikkei Asia.",
-    "Known for in-depth reporting, long-form features, and investigative journalism, my story “Sold in Cambodia: How Bangladeshis are lured into slavery” was recognised by the Global Investigative Journalism Network as one of Bangladesh's top investigative stories of 2022, and received the 8th BRAC Migration Media Award in 2023.",
+    "I report from Dhaka, where a morning can hold the country's largest griefs and its smallest, most stubborn ones at once. For a decade I have followed the people the headlines tend to walk past: the worker sold across a border, the family still counting who came home, a coastline losing its long argument with the sea.",
+    "My reporting on migration, climate, and power has run in The Guardian, Al Jazeera English, Nikkei Asia and, for years, The Business Standard; I now file for The Daily Waadaa and as Bangladesh correspondent for International News Services. “Sold in Cambodia,” an investigation into how Bangladeshis are lured into slavery, was named by the Global Investigative Journalism Network among the country's best of 2022 and carried the 8th BRAC Migration Media Award.",
+    "I came to journalism by way of literature, an English degree that taught me a sentence can also be a kind of evidence. When the deadlines loosen their grip I walk uphill, toward the higher trails of the Himalaya, a camera and a slower way of looking. And I am father to a small boy who is, so far, my most exacting editor: the one story I will never file, and the only one I am helplessly glad to be living.",
   ],
   contact: {
     email: "masum.engru@gmail.com",
     twitter: { handle: "@BillahTalks", url: "https://twitter.com/BillahTalks" },
     linkedin: { label: "LinkedIn", url: "https://www.linkedin.com/in/masum-billah-journalist/" },
-    youtube: { label: "A Journalist Who Travels", url: "https://www.youtube.com/results?search_query=A+Journalist+Who+Travels+Masum+Billah" },
+    youtube: { label: "A Journalist Who Travels", url: "https://www.youtube.com/@AJournalistWhoTravels" },
     tbs: { label: "The Business Standard", url: "https://www.tbsnews.net/author/masum-billah" },
   },
 };
@@ -54,7 +55,7 @@ export const beats = [
     full: "Migration & Trafficking",
     blurb:
       "Following Bangladeshi workers along the routes that promise a wage abroad and too often deliver bondage, from Cambodia to Russia to the scam compounds of Myanmar.",
-    kw: ["migrant", "migrat", "trafficke", "trafficking", "cambodia", "malaysia", "saudi", "qatar", "gulf", "remittance", "expatriate", "smuggl", "slavery", "recruit", "deport", "italy fever", "diaspora", "overseas", "kafala", "returnee", "manpower", "visa trade"],
+    kw: ["migrant", "migrat", "trafficke", "trafficking", "cambodia", "malaysia", "saudi", "qatar", "gulf", "remittance", "expatriate", "smuggl", "slavery", "recruit", "deport", "italy fever", "diaspora", "overseas", "kafala", "returnee", "manpower", "visa trade", "kuwait", "oman", "uae ", "dubai", "libya", "lebanon", "jordan", "housemaid", "domestic worker", "foreign employment", "labour migration", "labor migration", "irregular migration", "human smuggling", "bmet"],
   },
   {
     id: "climate",
@@ -65,20 +66,28 @@ export const beats = [
     kw: ["climate", "flood", "cyclone", "salin", "environment", "river", "wildlife", "snake", "viper", "nilgai", "hyacinth", "pollution", "biodiversity", "drought", "monsoon", "coastal", "sundarban", "elephant", "dolphin", "aquaculture", "wind power", "solar", "renewable", "carbon", "emission", "cop30", "cop29", "cop28", "tiger", "forest", "nature", "ecosystem", "plastic", "groundwater", "arsenic", "char", "haor", "delta", "heatwave", "waste", "conservation", "bird"],
   },
   {
+    id: "rights",
+    name: "Rights & Gender",
+    full: "Rights, Gender & the Marginalised",
+    blurb:
+      "Who the system protects and who it forgets: women's safety and freedom, labour and human rights, minorities, caste, and the people pushed to the edges.",
+    kw: ["human rights", "women", "woman ", "gender", "girl", "harassment", "domestic violence", "violence against", "rape", "child marriage", "child labour", "child labor", "dowry", "acid attack", "lgbt", "queer", "transgender", "disab", "minorit", "caste", "untouchable", "doms", "dom ", "press freedom", "freedom of expression", "torture", "custodial", "enforced disappear", "discrimination", "sexual", "widow", "marginal", "hijra"],
+  },
+  {
+    id: "tech",
+    name: "Tech & Digital",
+    full: "Tech & the Digital Economy",
+    blurb:
+      "The country going online: platform work and the influencer economy, cyber-scams and surveillance, AI, and a digital public square that can build or break a reputation overnight.",
+    kw: ["digital", "internet", "online", "influencer", "creator economy", "youtube", "facebook", "tiktok", "social media", "startup", "e-commerce", "ecommerce", "fintech", "artificial intelligence", " ai ", "cyber", "gig ", "gig economy", "ride-sharing", "ride sharing", "pathao", "freelanc", "outsourc", "smartphone", "mobile phone", "gaming", "gamers", " app ", " apps", "software", "surveillance", "deepfake", "misinformation", "screen time", "broadband", "tech "],
+  },
+  {
     id: "economy",
     name: "Economy",
     full: "Economy & Business",
     blurb:
-      "The garment floor and the wider economy: wages, exports, inflation, the digital hustle, and the people who absorb the shocks first.",
-    kw: ["econom", "inflation", "garment", "rmg", "apparel", "bgmea", "export", "import", "bank", "taka", "forex", "gdp", "trade", "factory", "wage", "union", "industry", "business", "startup", "investment", "budget", "adb", "imf", "tax", "revenue", "entrepreneur", "e-commerce", "influencer", "fintech", "loan", "debt", "market", "tariff", "price", "sme", "digital economy"],
-  },
-  {
-    id: "politics",
-    name: "Politics",
-    full: "Politics & Power",
-    blurb:
-      "Reporting a country remade: the fall of Sheikh Hasina, the disappeared, and an election held after seventeen years.",
-    kw: ["election", "awami", "bnp", "jamaat", "hasina", "parliament", "protest", "quota", "uprising", "disappeared", "minorit", "referendum", "constitution", "july charter", "ncp", "interim government", "tarique", "yunus", "cabinet", "poll", "campaign", "rally", "sedition", "tribunal", "verdict", "coup", "student-led", "voter", "ballot"],
+      "The garment floor and the wider economy: wages, exports, inflation, budgets, and the people who absorb the shocks first.",
+    kw: ["econom", "inflation", "garment", "rmg", "apparel", "bgmea", "export", "import", "bank", "taka", "forex", "gdp", "trade", "factory", "wage", "union", "industry", "business", "investment", "budget", "adb", "imf", "tax", "revenue", "entrepreneur", "loan", "debt", "market", "tariff", "price", "sme", "stock", "reserve", "subsidy", "fuel"],
   },
   {
     id: "geopolitics",
@@ -86,15 +95,23 @@ export const beats = [
     full: "Geopolitics & Diplomacy",
     blurb:
       "Bangladesh between giants: the Bay of Bengal, the China-India balance, Rohingya, and the diplomacy that shapes a nation's room to move.",
-    kw: ["china", "india", "geopolit", "diplomacy", "bay of bengal", "foreign", "iran", "teesta", "rohingya", "myanmar", "sanction", "belt and road", "quad", "indo-pacific", "delhi", "beijing", "washington", "treaty", "bilateral", "ambassador", "summit", "pakistan", "border", "relations", "corridor"],
+    kw: ["china", "india", "geopolit", "diplomacy", "bay of bengal", "foreign", "iran", "teesta", "rohingya", "myanmar", "sanction", "belt and road", "quad", "indo-pacific", "delhi", "beijing", "washington", "treaty", "bilateral", "ambassador", "summit", "pakistan", "border", "relations", "corridor", "israel", "ukraine"],
+  },
+  {
+    id: "politics",
+    name: "Politics",
+    full: "Politics & Power",
+    blurb:
+      "Reporting a country remade: the fall of Sheikh Hasina, the disappeared, and an election held after seventeen years.",
+    kw: ["election", "awami", "bnp", "jamaat", "hasina", "parliament", "protest", "quota", "uprising", "disappeared", "referendum", "constitution", "july charter", "ncp", "interim government", "tarique", "yunus", "cabinet", "poll", "campaign", "rally", "sedition", "tribunal", "verdict", "coup", "student-led", "voter", "ballot", "politic", "government", "party"],
   },
   {
     id: "society",
     name: "Society",
     full: "Society & Culture",
     blurb:
-      "The features that carry the texture of Bangladeshi life: caste, faith, football, health, gender, and a one-room school on a river island.",
-    kw: ["film", "music", "football", "cricket", "sport", "religio", "faith", "festival", "eid", "puja", "education", "school", "university", "health", "hospital", "dengue", "women", "gender", "marriage", "youth", "book", "food", "heritage", "caste", "dom", "lgbt", "mental", "youtube", "culture", "child", "family", "tradition", "art"],
+      "The features that carry the texture of Bangladeshi life: faith, football, food, health, heritage, and a one-room school on a river island.",
+    kw: ["film", "movie", "music", "football", "cricket", "sport", "religio", "faith", "festival", "eid", "puja", "hindu", "buddhist", "mosque", "temple", "education", "school", "university", "student", "health", "hospital", "dengue", "medicine", "doctor", "book", "poet", "literature", "food", "cuisine", "recipe", "heritage", "history", "marriage", "wedding", "youth", "art", "tradition", "folk", "family", "travel", "tourism", "language", "museum", "architecture"],
   },
 ];
 
@@ -490,11 +507,13 @@ export const awards = [
     name: "8th BRAC Migration Media Award",
     detail: "Awarded in 2023 for “Sold in Cambodia: How Bangladeshis are lured into slavery.”",
     year: "2023",
+    logo: "brac.png",
   },
   {
     name: "Global Investigative Journalism Network",
     detail: "“Sold in Cambodia” recognised as one of Bangladesh's top investigative stories of 2022.",
     year: "2022",
+    logo: "gijn.png",
   },
 ];
 
@@ -504,26 +523,32 @@ export const fellowships = [
     name: "Climate Change Media Partnership Fellow, COP30",
     org: "Earth Journalism Network & the Stanley Center for Peace and Security · Belém, Brazil",
     tag: "2025",
+    logo: "stanley.png",
   },
   {
     name: "National Press Foundation Fellow",
     org: "International Trade Training for Journalists",
+    logo: "npf.png",
   },
   {
     name: "Oxford Climate Journalism Network",
     org: "Member · Reuters Institute for the Study of Journalism, University of Oxford",
+    logo: "oxford.png",
   },
   {
     name: "Earth Journalism Network Fellow",
     org: "Internews",
+    logo: "ejn.png",
   },
   {
     name: "Open Climate Reporting Initiative",
     org: "Centre for Investigative Journalism & DataLEADS",
+    logo: "cij.png",
   },
   {
     name: "Himalayan Climate Data Field Lab",
     org: "ICIMOD and academic partners",
+    logo: "icimod.png",
   },
 ];
 
@@ -558,17 +583,24 @@ export const facts = [
 // Add an entry here and re-run `node src/build.mjs`.
 export const posts = [
   {
-    title: "Why I keep returning to the migrant trail",
-    date: "2026-02-10",
-    kind: "Note",
+    title: "Why I walk uphill",
+    date: "2026-03-02",
+    kind: "Trail note",
     body:
-      "Every few months a new route opens, or an old one turns deadlier. The names change, the brokers change, but the arithmetic of hope and debt stays the same. This is where I keep coming back.",
+      "Reporting teaches you to move fast and doubt everything. The mountains ask for the opposite. On the higher trails of the Himalaya I put the phone away and let a day take the whole day, one switchback at a time, until the valley I came from looks small enough to hold. I film some of it for a channel I call A Journalist Who Travels, though the walking is mostly for me.",
+  },
+  {
+    title: "The camera I carry when I'm off duty",
+    date: "2026-01-20",
+    kind: "Travel",
+    body:
+      "Off the clock I still can't stop looking. A tea stall at altitude, a porter's playlist, the exact blue an early sky goes before the peaks catch fire. Travel is where I remember that a story doesn't always have to indict something. Sometimes it just has to notice.",
   },
   {
     title: "Notes from COP30, Belém",
     date: "2025-11-18",
     kind: "Dispatch",
     body:
-      "Reporting the climate summit from the edge of the Amazon, thinking the whole time about a delta 15,000km away that will live or die by what is decided in rooms like these.",
+      "Reporting the climate summit from the edge of the Amazon, thinking the whole time about a delta fifteen thousand kilometres away that will live or die by what is decided in rooms like these.",
   },
 ];

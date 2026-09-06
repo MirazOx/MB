@@ -91,7 +91,7 @@ function head(title, desc, current) {
   <a class="home${current === "index.html" ? " is-current" : ""}" href="index.html"><span class="home-dot" aria-hidden="true"></span>Home</a>
   <nav class="nav">
     ${nav("work.html", "Work")}
-    ${nav("fellowships.html", "Fellowships")}
+    ${nav("fellowships.html", "Credentials")}
     ${nav("beyond.html", "Beyond")}
     ${nav("about.html", "About")}
     <a class="pill" href="about.html#contact">Get in touch</a>
@@ -127,7 +127,7 @@ function foot() {
   <span class="fm">Masum Billah</span>
   <nav>
     <a href="work.html">Work</a>
-    <a href="fellowships.html">Fellowships</a>
+    <a href="fellowships.html">Credentials</a>
     <a href="beyond.html">Beyond</a>
     <a href="about.html">About</a>
     <a href="${site.contact.twitter.url}" target="_blank" rel="noopener">X</a>
@@ -177,6 +177,37 @@ function leadCard(x) {
   </article>`;
 }
 
+// --- shared: beat strip + archive block ------------------------------------
+function beatStrip(currentId) {
+  const all = `<a class="beatchip${!currentId ? " is-active" : ""}" href="work.html">All <span class="c">${archive.length}</span></a>`;
+  const chips = beats.map((b) => `<a class="beatchip${b.id === currentId ? " is-active" : ""}" href="beat-${b.id}.html">${esc(b.name)} <span class="c">${beatCounts[b.id] || 0}</span></a>`).join("");
+  return `<nav class="beatstrip" aria-label="Browse by beat">${all}${chips}</nav>`;
+}
+function archiveBlock(items, { withBeat = true } = {}) {
+  const oc = {}; items.forEach((x) => { oc[x.outlet] = (oc[x.outlet] || 0) + 1; });
+  const outletsSorted = Object.keys(oc).sort((a, b) => oc[b] - oc[a]);
+  const years = [...new Set(items.map((x) => x.year).filter(Boolean))].sort().reverse();
+  const beatOpts = withBeat ? beats.map((b) => `<option value="${b.id}">${esc(b.name)} (${beatCounts[b.id] || 0})</option>`).join("") : "";
+  const outletOpts = outletsSorted.map((o) => `<option value="${attr(o)}">${esc(o)} (${oc[o]})</option>`).join("");
+  const yearOpts = years.map((y) => `<option value="${esc(y)}">${esc(y)}</option>`).join("");
+  const rows = items.map((x) => archiveRow(x, { showBeat: true })).join("\n");
+  return `
+<div class="filterbar filterbar--archive"><div class="wrap">
+  <div class="controls">
+    <input type="search" id="q" class="search" placeholder="Search titles or outlets…" aria-label="Search stories" autocomplete="off">
+    ${withBeat ? `<select id="f-beat" aria-label="Filter by beat"><option value="">All beats</option>${beatOpts}</select>` : ""}
+    <select id="f-outlet" aria-label="Filter by outlet"><option value="">All outlets (${items.length})</option>${outletOpts}</select>
+    <select id="f-year" aria-label="Filter by year"><option value="">All years</option>${yearOpts}</select>
+    <select id="f-sort" aria-label="Sort order"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="az">Title A–Z</option></select>
+  </div>
+  <p class="count" id="count" aria-live="polite">Showing ${items.length} of ${items.length} pieces</p>
+</div></div>
+<div class="wrap">
+  <ul class="stories archive-list" id="archive-list">${rows}</ul>
+  <p class="no-results is-hidden" id="no-results">No pieces match those filters.</p>
+</div>`;
+}
+
 // ===========================================================================
 // INDEX — name + photo banner, then floating "Work appeared in" logos
 // ===========================================================================
@@ -203,8 +234,8 @@ function buildIndex() {
     <p class="banner-sub reveal d2">${esc(site.tagline)}</p>
     <a class="btn btn--lg reveal d3" href="work.html">See my work ${arwR}</a>
   </div>
-  <figure class="banner-photo reveal d2">
-    <div class="frame"><img src="assets/masum-billah.png" alt="Masum Billah, photographed in Dhaka" width="1024" height="577"></div>
+  <figure class="banner-photo cutout reveal d2">
+    <img src="assets/masum-landing.png" alt="Masum Billah" width="1263" height="1246">
   </figure>
 </div></section>
 
@@ -225,30 +256,20 @@ function buildWork() {
   const rest = featured.slice(1);
   const restRows = rest.map((a) => archiveRow(a, { showBeat: true, excerpt: true })).join("\n");
 
-  const strip = beats
-    .map((b) => `<a class="beatchip" href="beat-${b.id}.html">${esc(b.name)} <span class="c">${beatCounts[b.id] || 0}</span></a>`)
-    .join("\n");
-
-  const beatOpts = beats.map((b) => `<option value="${b.id}">${esc(b.name)} (${beatCounts[b.id] || 0})</option>`).join("");
-  const outletOpts = archiveOutlets.map((o) => `<option value="${attr(o)}">${esc(o)} (${outletCounts[o]})</option>`).join("");
-  const yearOpts = archiveYears.map((y) => `<option value="${esc(y)}">${esc(y)}</option>`).join("");
-  const rows = archive.map((x) => archiveRow(x, { showBeat: true })).join("\n");
-
   const body = `
 <section class="page-head"><div class="wrap">
   <p class="eyebrow reveal">Selected work</p>
   <h1 class="display reveal d1">The work I'm proudest of.</h1>
-  <p class="page-sub reveal d2">A handful of the stories that mattered most, the beats I keep returning to, then the full archive of everything below.</p>
+</div></section>
+
+<section class="beatstrip-wrap beatstrip-wrap--top"><div class="wrap">
+  <p class="eyebrow reveal">Explore by beat</p>
+  ${beatStrip(null)}
 </div></section>
 
 <section class="impactful"><div class="wrap">
   ${leadCard(lead)}
   <ul class="stories impactful-rest">${restRows}</ul>
-</div></section>
-
-<section class="beatstrip-wrap"><div class="wrap">
-  <p class="eyebrow reveal">Explore by beat</p>
-  <nav class="beatstrip reveal" aria-label="Browse by beat">${strip}</nav>
 </div></section>
 
 <section class="archive-full"><div class="wrap">
@@ -257,24 +278,7 @@ function buildWork() {
     <p class="page-sub">Everything published, ${archive.length} pieces and counting. Search, or filter by beat, outlet and year.</p>
   </div>
 </div>
-<div class="filterbar filterbar--archive"><div class="wrap">
-  <div class="controls">
-    <input type="search" id="q" class="search" placeholder="Search titles or outlets…" aria-label="Search stories" autocomplete="off">
-    <select id="f-beat" aria-label="Filter by beat"><option value="">All beats</option>${beatOpts}</select>
-    <select id="f-outlet" aria-label="Filter by outlet"><option value="">All outlets (${archive.length})</option>${outletOpts}</select>
-    <select id="f-year" aria-label="Filter by year"><option value="">All years</option>${yearOpts}</select>
-    <select id="f-sort" aria-label="Sort order">
-      <option value="new">Newest first</option>
-      <option value="old">Oldest first</option>
-      <option value="az">Title A–Z</option>
-    </select>
-  </div>
-  <p class="count" id="count" aria-live="polite">Showing ${archive.length} of ${archive.length} pieces</p>
-</div></div>
-<div class="wrap">
-  <ul class="stories archive-list" id="archive-list">${rows}</ul>
-  <p class="no-results is-hidden" id="no-results">No pieces match those filters.</p>
-</div>
+${archiveBlock(archive, { withBeat: true })}
 <div class="sec--tight"></div>
 `;
   return head("Work · Masum Billah", "Selected and complete work by Masum Billah: investigative and long-form reporting from Bangladesh across " + archiveOutlets.length + " newsrooms.", "work.html") + body + foot();
@@ -288,28 +292,34 @@ function buildBeat(b) {
   const feat = items.filter((x) => curatedFeatured.has(x.url));
   const ordered = [...feat, ...items.filter((x) => !curatedFeatured.has(x.url))];
   const lead = ordered[0];
-  const highlights = ordered.slice(1, 13);
+  const highlights = ordered.slice(1, 9);
   const rows = highlights.map((x) => archiveRow(x, { showBeat: false, excerpt: !!x.excerpt })).join("\n");
-  const others = beats.filter((x) => x.id !== b.id).map((x) => `<a class="beatchip" href="beat-${x.id}.html">${esc(x.name)}</a>`).join("");
 
   const body = `
 <section class="page-head page-head--beat"><div class="wrap">
   <p class="eyebrow reveal"><a href="work.html" class="back">← All work</a></p>
   <h1 class="display reveal d1">${esc(b.full)}</h1>
   <p class="page-sub reveal d2">${esc(b.blurb)}</p>
-  <p class="beat-count reveal d2">${items.length} ${items.length === 1 ? "story" : "stories"} in this beat</p>
+</div></section>
+
+<section class="beatstrip-wrap beatstrip-wrap--top"><div class="wrap">
+  <p class="eyebrow reveal">Jump to a beat</p>
+  ${beatStrip(b.id)}
 </div></section>
 
 <section class="impactful"><div class="wrap">
   ${lead ? leadCard(lead) : ""}
   <ul class="stories impactful-rest">${rows}</ul>
-  <a class="btn btn--ghost beat-all" href="work.html#${b.id}">See all ${items.length} in the archive ${arwR}</a>
 </div></section>
 
-<section class="beatstrip-wrap beatstrip-wrap--alt"><div class="wrap">
-  <p class="eyebrow reveal">Other beats</p>
-  <nav class="beatstrip reveal" aria-label="Other beats">${others}</nav>
-</div></section>
+<section class="archive-full"><div class="wrap">
+  <div class="sec-head reveal">
+    <h2 class="display">All ${esc(b.name)} stories</h2>
+    <p class="page-sub">${items.length} ${items.length === 1 ? "piece" : "pieces"} in this beat. Search within it, or filter by outlet and year.</p>
+  </div>
+</div>
+${archiveBlock(items, { withBeat: false })}
+<div class="sec--tight"></div>
 `;
   return head(`${b.full} · Masum Billah`, `${b.full}: ${b.blurb}`, "work.html") + body + foot();
 }
@@ -318,19 +328,41 @@ function buildBeat(b) {
 // FELLOWSHIPS
 // ===========================================================================
 function buildFellowships() {
-  const fellowList = fellowships.map((f) => `<li class="cred reveal"><div class="cname">${esc(f.name)}</div><div class="cmeta">${esc(f.org)}</div>${f.tag ? `<span class="cyear">${esc(f.tag)}</span>` : ""}</li>`).join("\n");
-  const awardList = awards.map((a) => `<li class="cred reveal"><div class="cname">${esc(a.name)}</div><div class="cmeta">${esc(a.detail)}</div><span class="cyear">${esc(a.year)}</span></li>`).join("\n");
+  const orgLogo = (l) => (l ? `assets/logos/orgs/${l}` : null);
+  const fcard = (x, isAward = false) => {
+    const src = orgLogo(x.logo);
+    return `<article class="fcard reveal">
+      <div class="fcard-logo">${src ? `<img src="${src}" alt="" loading="lazy" onerror="this.closest('.fcard-logo').classList.add('is-empty')">` : ""}<span class="fcard-fb">${esc((x.name || "?").slice(0, 1))}</span></div>
+      <div class="fcard-body">
+        <h3 class="fcard-name">${esc(x.name)}</h3>
+        <p class="fcard-org">${esc(x.org || x.detail)}</p>
+      </div>
+      ${(x.tag || x.year) ? `<span class="fcard-year">${esc(x.tag || x.year)}</span>` : ""}
+    </article>`;
+  };
+  const strip = [...fellowships, ...awards]
+    .filter((x) => x.logo)
+    .map((x) => `<li class="orgmark reveal"><img src="assets/logos/orgs/${x.logo}" alt="${attr(x.name)}" loading="lazy" onerror="this.style.visibility='hidden'"></li>`)
+    .join("");
+
   const body = `
-<section class="page-head"><div class="wrap">
-  <p class="eyebrow reveal">Fellowships &amp; training</p>
+<section class="page-head page-head--accent"><div class="wrap">
+  <p class="eyebrow reveal">Fellowships, training &amp; awards</p>
   <h1 class="display reveal d1">The rooms that shaped the reporting.</h1>
-  <p class="page-sub reveal d2">Fellowships, newsroom training, and recognition, from climate journalism at Oxford and COP30 to investigative honours at home.</p>
+  <p class="page-sub reveal d2">From climate journalism at Oxford and a COP30 fellowship in the Amazon to investigative honours at home, the programmes and prizes that sharpened the work.</p>
+  <ul class="orgstrip reveal d3">${strip}</ul>
 </div></section>
-<section class="sec--tight"><div class="wrap creds-single">
-  <div><h2 class="display sec-label reveal">Fellowships &amp; programmes</h2><ul class="cred-list">${fellowList}</ul></div>
-  <div><h2 class="display sec-label reveal">Awards &amp; recognition</h2><ul class="cred-list">${awardList}</ul></div>
+
+<section class="sec--tight"><div class="wrap">
+  <h2 class="display sec-label reveal">Fellowships &amp; programmes</h2>
+  <div class="fcards">${fellowships.map((f) => fcard(f)).join("\n")}</div>
+</div></section>
+
+<section class="sec--tight" style="border-top:1px solid var(--line)"><div class="wrap">
+  <h2 class="display sec-label reveal">Awards &amp; recognition</h2>
+  <div class="fcards">${awards.map((a) => fcard(a, true)).join("\n")}</div>
 </div></section>`;
-  return head("Fellowships & Training · Masum Billah", "Fellowships, training and awards: Oxford Climate Journalism Network, National Press Foundation, CCMP COP30, Earth Journalism Network, and the BRAC Migration Media Award.", "fellowships.html") + body + foot();
+  return head("Credentials · Masum Billah", "Fellowships, training and awards: Oxford Climate Journalism Network, National Press Foundation, CCMP COP30, Earth Journalism Network, and the BRAC Migration Media Award.", "fellowships.html") + body + foot();
 }
 
 // ===========================================================================
@@ -345,10 +377,16 @@ function buildBeyond() {
       }).join("\n")
     : `<p class="empty">Nothing here yet. Check back soon.</p>`;
   const body = `
-<section class="page-head"><div class="wrap">
-  <p class="eyebrow reveal">Beyond the byline</p>
-  <h1 class="display reveal d1">Beyond.</h1>
-  <p class="page-sub reveal d2">Notes, half-formed thoughts, and things worth sharing that never make it into a filed story.</p>
+<section class="page-head page-head--beyond"><div class="wrap beyond-head">
+  <div class="beyond-intro">
+    <p class="eyebrow reveal">Beyond the byline</p>
+    <h1 class="display reveal d1">Beyond.</h1>
+    <p class="page-sub reveal d2">The life that happens between deadlines: the trails, the travels, and a small boy who outranks every editor I've had.</p>
+  </div>
+  <figure class="beyond-photo reveal d2">
+    <img src="assets/masum-son.png" alt="Masum Billah with his son" width="1088" height="1445">
+    <figcaption>Off the clock, at home in Dhaka.</figcaption>
+  </figure>
 </div></section>
 <section class="sec--tight"><div class="wrap notes">${list}</div></section>`;
   return head("Beyond · Masum Billah", "Notes, quick blogs, and thoughts from journalist Masum Billah.", "beyond.html") + body + foot();
@@ -393,7 +431,7 @@ function buildAbout() {
     <div class="col reveal d1">
       <h2 class="col-h">Accolades</h2>
       <ul class="deflist">${accolades}</ul>
-      <a class="link-more" href="fellowships.html">Fellowships &amp; training ${arwR}</a>
+      <a class="link-more" href="fellowships.html">See all credentials ${arwR}</a>
     </div>
     <div class="col reveal d2">
       <h2 class="col-h">Education</h2>

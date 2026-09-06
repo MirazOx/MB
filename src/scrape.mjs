@@ -85,9 +85,39 @@ function scrapeAJ() {
   return items;
 }
 
+// ---- The Daily Waadaa (Quintype advanced-search API) ----------------------
+function scrapeDW() {
+  const items = [];
+  const seen = new Set();
+  const AUTHOR = 2487515;
+  for (let offset = 0; offset <= 400; offset += 20) {
+    const url = `https://www.dailywaadaa.com/api/v1/advanced-search?author-id=${AUTHOR}&limit=20&offset=${offset}`;
+    let data;
+    try { data = JSON.parse(get(url)); } catch { break; }
+    const stories = data.items || data.stories || [];
+    if (!stories.length) break;
+    for (const s of stories) {
+      const url2 = s.url || (s.slug ? "https://dailywaadaa.com/" + s.slug : null);
+      if (!url2 || seen.has(url2)) continue;
+      // confirm authorship
+      const isMine = (s.authors || []).some((a) => a.id === AUTHOR) || /masum billah/i.test(s["author-name"] || "");
+      if (!isMine) continue;
+      seen.add(url2);
+      const hero = s["hero-image-s3-key"];
+      const image = hero ? `https://images.assettype.com/${hero}?w=480&auto=format` : null;
+      const y = (String(url2).match(/\/(20\d\d)\//) || [])[1];
+      items.push({ url: url2, title: decode(s.headline || ""), image, outlet: "The Daily Waadaa", year: y || null });
+    }
+    if (stories.length < 20) break;
+  }
+  process.stdout.write(`Daily Waadaa: ${items.length} articles\n`);
+  return items;
+}
+
 const tbs = scrapeTBS();
 const aj = scrapeAJ();
-const all = [...tbs, ...aj];
+const dw = scrapeDW();
+const all = [...dw, ...tbs, ...aj];
 writeFileSync(join(HERE, "scraped.json"), JSON.stringify(all, null, 2));
-console.log(`\nScraped ${all.length} total (TBS ${tbs.length}, AJ ${aj.length}). Wrote src/scraped.json`);
+console.log(`\nScraped ${all.length} total (DW ${dw.length}, TBS ${tbs.length}, AJ ${aj.length}). Wrote src/scraped.json`);
 console.log("With thumbnails:", all.filter((a) => a.image).length);
