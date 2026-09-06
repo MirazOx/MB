@@ -198,12 +198,13 @@ function archiveBlock(items, { withBeat = true } = {}) {
     ${withBeat ? `<select id="f-beat" aria-label="Filter by beat"><option value="">All beats</option>${beatOpts}</select>` : ""}
     <select id="f-outlet" aria-label="Filter by outlet"><option value="">All outlets (${items.length})</option>${outletOpts}</select>
     <select id="f-year" aria-label="Filter by year"><option value="">All years</option>${yearOpts}</select>
-    <select id="f-sort" aria-label="Sort order"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="az">Title A–Z</option></select>
+    <select id="f-sort" aria-label="Sort order"><option value="random" selected>Shuffle (Random)</option><option value="new">Newest first</option><option value="old">Oldest first</option><option value="az">Title A–Z</option></select>
   </div>
   <p class="count" id="count" aria-live="polite">Showing ${items.length} of ${items.length} pieces</p>
 </div></div>
 <div class="wrap">
   <ul class="stories archive-list" id="archive-list">${rows}</ul>
+  <button id="load-more" class="btn btn--lg" type="button" style="margin: 2.5rem auto; display: none;">See more stories</button>
   <p class="no-results is-hidden" id="no-results">No pieces match those filters.</p>
 </div>`;
 }
@@ -383,10 +384,7 @@ function buildBeyond() {
     <h1 class="display reveal d1">Beyond.</h1>
     <p class="page-sub reveal d2">The life that happens between deadlines: the trails, the travels, and a small boy who outranks every editor I've had.</p>
   </div>
-  <figure class="beyond-photo reveal d2">
-    <img src="assets/masum-son.png" alt="Masum Billah with his son" width="1088" height="1445">
-    <figcaption>Off the clock, at home in Dhaka.</figcaption>
-  </figure>
+  
 </div></section>
 <section class="sec--tight"><div class="wrap notes">${list}</div></section>`;
   return head("Beyond · Masum Billah", "Notes, quick blogs, and thoughts from journalist Masum Billah.", "beyond.html") + body + foot();
@@ -414,7 +412,7 @@ function buildAbout() {
   <div class="cover-cap wrap">
     <p class="eyebrow">About</p>
     <h1 class="display">Masum Billah</h1>
-    <p class="cover-role">${esc(site.title)} · Dhaka, Bangladesh</p>
+    
   </div>
 </section>
 
