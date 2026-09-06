@@ -25,46 +25,18 @@
   // --- Progressive reveal ----------------------------------------------------
   // Only hide-then-reveal when JS runs and motion is allowed; content stays
   // visible by default for no-JS / reduced-motion / headless renderers.
-  if (!reduce && "IntersectionObserver" in window) {
-    document.documentElement.classList.add("js-motion");
+  if (!reduce) {
     var reveals = [].slice.call(document.querySelectorAll(".reveal"));
-    var show = function (el) {
-      el.classList.add("in");
-      io.unobserve(el);
-    };
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting) show(e.target);
-        });
-      },
-      { rootMargin: "0px 0px -6% 0px", threshold: 0.05 }
-    );
-
-    // Reveal what's in (or near) the viewport now; observe the rest for scroll.
-    var firstPass = function () {
+    // Animate only elements already on screen at load. Below-the-fold content
+    // stays visible (no entrance) so nothing depends on a reveal firing.
+    var animateInView = function () {
       reveals.forEach(function (el) {
-        if (el.classList.contains("in")) return;
-        if (el.getBoundingClientRect().top < window.innerHeight * 0.98) show(el);
-        else io.observe(el);
+        if (el.classList.contains("anim")) return;
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.95) el.classList.add("anim");
       });
     };
-    // Wait for layout to settle (web fonts shift positions) before measuring.
-    requestAnimationFrame(function () { requestAnimationFrame(firstPass); });
-
-    // Font/image load can push new elements into view — reveal those too.
-    window.addEventListener("load", function () {
-      reveals.forEach(function (el) {
-        if (!el.classList.contains("in") && el.getBoundingClientRect().top < window.innerHeight) show(el);
-      });
-    });
-
-    // Safety net: never let anything that's actually on screen stay hidden.
-    setTimeout(function () {
-      reveals.forEach(function (el) {
-        if (!el.classList.contains("in") && el.getBoundingClientRect().top < window.innerHeight) show(el);
-      });
-    }, 1200);
+    requestAnimationFrame(function () { requestAnimationFrame(animateInView); });
+    window.addEventListener("load", animateInView);
   }
 
   // --- Work page: beat filter ------------------------------------------------
@@ -79,13 +51,6 @@
       sections.forEach(function (sec) {
         var show = filter === "all" || sec.dataset.beat === filter;
         sec.classList.toggle("is-hidden", !show);
-        if (show) {
-          // A shown section must be fully visible even if its rows never
-          // scrolled into view under the previous filter.
-          sec.querySelectorAll(".reveal").forEach(function (el) {
-            el.classList.add("in");
-          });
-        }
       });
     }
 
@@ -101,7 +66,7 @@
         // Nudge the beats into view under the sticky bars.
         var anchor = document.getElementById("beats");
         if (anchor) {
-          var y = anchor.getBoundingClientRect().top + window.scrollY - 96;
+          var y = anchor.getBoundingClientRect().top + window.scrollY - 128;
           window.scrollTo({ top: Math.max(0, y), behavior: reduce ? "auto" : "smooth" });
         }
       });
