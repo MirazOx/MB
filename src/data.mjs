@@ -23,7 +23,7 @@ export const site = {
     email: "masum.engru@gmail.com",
     twitter: { handle: "@BillahTalks", url: "https://twitter.com/BillahTalks" },
     linkedin: { label: "LinkedIn", url: "https://www.linkedin.com/in/masum-billah-journalist/" },
-    website: { label: "Personal site", url: "https://bit.ly/3LBxljq" },
+    youtube: { label: "A Journalist Who Travels", url: "https://www.youtube.com/results?search_query=A+Journalist+Who+Travels+Masum+Billah" },
     tbs: { label: "The Business Standard", url: "https://www.tbsnews.net/author/masum-billah" },
   },
 };
@@ -45,38 +45,75 @@ export const outlets = [
 
 export const publications = outlets.map((o) => o.name);
 
-// Beats, in the order they appear on the Work page.
+// Beats. `name` labels the strip/tags, `full` titles the beat page, `kw` drives
+// the keyword classifier that files every scraped article into a beat.
 export const beats = [
   {
     id: "migration",
-    name: "Migration & Trafficking",
+    name: "Migration",
+    full: "Migration & Trafficking",
     blurb:
       "Following Bangladeshi workers along the routes that promise a wage abroad and too often deliver bondage, from Cambodia to Russia to the scam compounds of Myanmar.",
+    kw: ["migrant", "migrat", "trafficke", "trafficking", "cambodia", "malaysia", "saudi", "qatar", "gulf", "remittance", "expatriate", "smuggl", "slavery", "recruit", "deport", "italy fever", "diaspora", "overseas", "kafala", "returnee", "manpower", "visa trade"],
   },
   {
     id: "climate",
-    name: "Climate & Environment",
+    name: "Climate",
+    full: "Climate & Environment",
     blurb:
       "A delta under pressure: salinity creeping inland, rivers poisoned, wildlife cornered, and the science of a changing monsoon.",
+    kw: ["climate", "flood", "cyclone", "salin", "environment", "river", "wildlife", "snake", "viper", "nilgai", "hyacinth", "pollution", "biodiversity", "drought", "monsoon", "coastal", "sundarban", "elephant", "dolphin", "aquaculture", "wind power", "solar", "renewable", "carbon", "emission", "cop30", "cop29", "cop28", "tiger", "forest", "nature", "ecosystem", "plastic", "groundwater", "arsenic", "char", "haor", "delta", "heatwave", "waste", "conservation", "bird"],
+  },
+  {
+    id: "economy",
+    name: "Economy",
+    full: "Economy & Business",
+    blurb:
+      "The garment floor and the wider economy: wages, exports, inflation, the digital hustle, and the people who absorb the shocks first.",
+    kw: ["econom", "inflation", "garment", "rmg", "apparel", "bgmea", "export", "import", "bank", "taka", "forex", "gdp", "trade", "factory", "wage", "union", "industry", "business", "startup", "investment", "budget", "adb", "imf", "tax", "revenue", "entrepreneur", "e-commerce", "influencer", "fintech", "loan", "debt", "market", "tariff", "price", "sme", "digital economy"],
   },
   {
     id: "politics",
-    name: "Politics & Power",
+    name: "Politics",
+    full: "Politics & Power",
     blurb:
       "Reporting a country remade: the fall of Sheikh Hasina, the disappeared, and an election held after seventeen years.",
+    kw: ["election", "awami", "bnp", "jamaat", "hasina", "parliament", "protest", "quota", "uprising", "disappeared", "minorit", "referendum", "constitution", "july charter", "ncp", "interim government", "tarique", "yunus", "cabinet", "poll", "campaign", "rally", "sedition", "tribunal", "verdict", "coup", "student-led", "voter", "ballot"],
   },
   {
-    id: "labour",
-    name: "Labour & Economy",
+    id: "geopolitics",
+    name: "Geopolitics",
+    full: "Geopolitics & Diplomacy",
     blurb:
-      "The garment floor and the wider economy: wages, unrest, and the people who absorb the shocks first.",
+      "Bangladesh between giants: the Bay of Bengal, the China-India balance, Rohingya, and the diplomacy that shapes a nation's room to move.",
+    kw: ["china", "india", "geopolit", "diplomacy", "bay of bengal", "foreign", "iran", "teesta", "rohingya", "myanmar", "sanction", "belt and road", "quad", "indo-pacific", "delhi", "beijing", "washington", "treaty", "bilateral", "ambassador", "summit", "pakistan", "border", "relations", "corridor"],
   },
   {
     id: "society",
-    name: "Society & Culture",
+    name: "Society",
+    full: "Society & Culture",
     blurb:
-      "The features that carry the texture of Bangladeshi life: caste, faith, football, a one-room school on a river island.",
+      "The features that carry the texture of Bangladeshi life: caste, faith, football, health, gender, and a one-room school on a river island.",
+    kw: ["film", "music", "football", "cricket", "sport", "religio", "faith", "festival", "eid", "puja", "education", "school", "university", "health", "hospital", "dengue", "women", "gender", "marriage", "youth", "book", "food", "heritage", "caste", "dom", "lgbt", "mental", "youtube", "culture", "child", "family", "tradition", "art"],
   },
+];
+
+// Skills / expertise (from his own site), for the About page.
+export const expertise = [
+  "Investigative journalism",
+  "Long-form features",
+  "Data journalism",
+  "Climate & environment",
+  "Energy & agriculture",
+  "Migration & labour rights",
+  "Bangladesh's digital economy",
+  "Politics & geopolitics",
+];
+
+// Education.
+export const education = [
+  { degree: "MA, International Relations", org: "University of Dhaka" },
+  { degree: "BA (Hons), English", org: "University of Rajshahi" },
 ];
 
 // Every article. `featured` marks front-page lead stories.
@@ -297,7 +334,7 @@ export const articles = [
   },
   {
     title: "Is Bangladesh growing closer to China at the expense of its ties with India?",
-    beat: "politics",
+    beat: "geopolitics",
     publication: "The Diplomat",
     year: "2020",
     url: "https://thediplomat.com/2020/09/is-bangladesh-growing-closer-to-china-at-the-expense-of-its-relations-with-india/",
@@ -308,7 +345,7 @@ export const articles = [
   // ---------------- Labour & Economy ----------------
   {
     title: "Sadeka's magic lamp: How a garment worker became an RMG CEO",
-    beat: "labour",
+    beat: "economy",
     publication: "The Business Standard",
     year: "2022",
     url: "https://www.tbsnews.net/features/panorama/sadekas-magic-lamp-how-garment-worker-became-rmg-ceo-604130",
@@ -318,7 +355,7 @@ export const articles = [
   },
   {
     title: "Tackling 'ineffective' Bangladesh anti-harassment committees",
-    beat: "labour",
+    beat: "economy",
     publication: "Just-Style",
     year: "2024",
     url: "https://www.just-style.com/features/tackling-ineffective-bangladesh-anti-harassment-committees/",
@@ -327,7 +364,7 @@ export const articles = [
   },
   {
     title: "Bangladesh's apparel sector reckons with the fallout of a union leader's murder",
-    beat: "labour",
+    beat: "economy",
     publication: "Just-Style",
     year: "2024",
     url: "https://www.just-style.com/features/bangladesh-apparel-sectors-concerns-over-union-leader-murder-fallout/",
@@ -336,7 +373,7 @@ export const articles = [
   },
   {
     title: "Bangladesh turns to an $80bn ADB-backed economic corridor for growth",
-    beat: "labour",
+    beat: "economy",
     publication: "Nikkei Asia",
     year: "2024",
     url: "https://asia.nikkei.com/economy/bangladesh-turns-to-80bn-adb-backed-economic-corridor-for-growth",
@@ -345,7 +382,7 @@ export const articles = [
   },
   {
     title: "Bangladesh's inflation woes heightened by Iran war fallout",
-    beat: "labour",
+    beat: "economy",
     publication: "Nikkei Asia",
     year: "2025",
     url: "https://asia.nikkei.com/spotlight/iran-tensions/bangladesh-s-inflation-woes-heightened-by-iran-war-fallout",
@@ -354,7 +391,7 @@ export const articles = [
   },
   {
     title: "When the middle class tighten their belts, these people suffer the most",
-    beat: "labour",
+    beat: "economy",
     publication: "The Business Standard",
     year: "2022",
     url: "https://www.tbsnews.net/features/panorama/when-middle-class-tighten-their-belt-these-people-suffer-most-587666",
@@ -363,7 +400,7 @@ export const articles = [
   },
   {
     title: "The rise of the 'influencer' market in Bangladesh",
-    beat: "labour",
+    beat: "economy",
     publication: "The Business Standard",
     year: "2022",
     url: "https://www.tbsnews.net/long-read/rise-influencer-market-bangladesh-546854",

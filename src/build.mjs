@@ -2,12 +2,13 @@
 import { writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { site, outlets, publications, articles, awards, fellowships, path as career, facts, posts } from "./data.mjs";
+import { site, outlets, publications, beats, articles, awards, fellowships, path as career, facts, posts, expertise, education } from "./data.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
+const V = Date.now(); // cache-busting version for styles/js
 const readJSON = (f) => (existsSync(join(HERE, f)) ? JSON.parse(readFileSync(join(HERE, f), "utf8")) : {});
-const banners = readJSON("banners.json");          // curated url -> local file
+const banners = readJSON("banners.json");
 const scraped = existsSync(join(HERE, "scraped.json")) ? JSON.parse(readFileSync(join(HERE, "scraped.json"), "utf8")) : [];
 
 const esc = (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -15,15 +16,28 @@ const attr = (s = "") => esc(s).replace(/"/g, "&quot;");
 const arw = '<span class="arw" aria-hidden="true">↗</span>';
 const arwR = '<span class="arw" aria-hidden="true">→</span>';
 
+const beatById = Object.fromEntries(beats.map((b) => [b.id, b]));
 const shortOutlet = (pub) => {
   const o = outlets.find((x) => x.name === pub);
   if (o?.short) return o.short;
   return { "The Business Standard": "TBS", "South China Morning Post": "SCMP", "Al Jazeera English": "Al Jazeera", "Energy Institute": "Energy Inst." }[pub] || pub;
 };
-const featured = articles.filter((a) => a.featured);
+
+// ---- Beat classifier -------------------------------------------------------
+function classifyBeat(text) {
+  const t = (" " + text + " ").toLowerCase();
+  let best = "society", score = 0;
+  for (const b of beats) {
+    let s = 0;
+    for (const k of b.kw) if (t.includes(k)) s++;
+    if (s > score) { score = s; best = b.id; }
+  }
+  return best;
+}
 
 // ---- Merge scraped + curated into one archive ------------------------------
 const rank = (x) => (x.year ? Number(x.year) + 0.5 : x.id ? 2020 + (x.id - 35591) / 221000 : 0);
+const curatedFeatured = new Set(articles.filter((a) => a.featured).map((a) => a.url));
 const archiveMap = new Map();
 for (const s of scraped) archiveMap.set(s.url, { url: s.url, title: s.title, outlet: s.outlet, image: s.image, section: s.section || null, id: s.id, year: s.year || null });
 for (const a of articles) {
@@ -32,25 +46,23 @@ for (const a of articles) {
     url: a.url, title: a.title, outlet: a.publication,
     image: banners[a.url] || ex.image || null,
     year: a.year || ex.year || null, section: ex.section || null, id: ex.id || null,
-    excerpt: a.excerpt, curated: true,
+    excerpt: a.excerpt, curated: true, beat: a.beat, laurel: a.laurel,
   });
 }
-const archive = [...archiveMap.values()].map((x) => ({ ...x, rank: rank(x) })).sort((a, b) => b.rank - a.rank);
-const outletCounts = {};
-archive.forEach((x) => { outletCounts[x.outlet] = (outletCounts[x.outlet] || 0) + 1; });
+const archive = [...archiveMap.values()].map((x) => ({ ...x, beat: x.beat || classifyBeat(x.title + " " + (x.section || "")), rank: rank(x) })).sort((a, b) => b.rank - a.rank);
+const outletCounts = {}, beatCounts = {};
+archive.forEach((x) => { outletCounts[x.outlet] = (outletCounts[x.outlet] || 0) + 1; beatCounts[x.beat] = (beatCounts[x.beat] || 0) + 1; });
 const archiveOutlets = Object.keys(outletCounts).sort((a, b) => outletCounts[b] - outletCounts[a]);
 const archiveYears = [...new Set(archive.map((x) => x.year).filter(Boolean))].sort().reverse();
 
 const favicon =
   "data:image/svg+xml," +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#1b2430"/><text x="50%" y="52%" dy=".02em" text-anchor="middle" dominant-baseline="middle" font-family="Georgia,serif" font-size="34" fill="#eef2f6">M<tspan fill="#8ab4f8">.</tspan></text></svg>`
-  );
+  encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#1b2430"/><text x="50%" y="52%" dy=".02em" text-anchor="middle" dominant-baseline="middle" font-family="Georgia,serif" font-size="34" fill="#eef2f6">M<tspan fill="#8ab4f8">.</tspan></text></svg>`);
 const jsonLd = {
   "@context": "https://schema.org", "@type": "Person", name: site.name, jobTitle: "Journalist",
   description: site.tagline, address: { "@type": "PostalAddress", addressLocality: "Dhaka", addressCountry: "BD" },
-  email: "mailto:" + site.contact.email, knowsLanguage: ["English", "Bengali"],
-  sameAs: [site.contact.twitter.url, site.contact.linkedin.url, site.contact.website.url],
+  email: "mailto:" + site.contact.email, knowsLanguage: ["English", "Bengali"], alumniOf: education.map((e) => e.org),
+  sameAs: [site.contact.twitter.url, site.contact.linkedin.url, site.contact.tbs.url, site.contact.youtube.url],
 };
 
 function head(title, desc, current) {
@@ -70,7 +82,7 @@ function head(title, desc, current) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400;1,7..72,500&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=${V}">
 <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>
 <body>
@@ -101,7 +113,7 @@ function contactBand() {
       ${chan("Email", c.email, "mailto:" + c.email, false)}
       ${chan("X / Twitter", c.twitter.handle, c.twitter.url)}
       ${chan("LinkedIn", "Masum Billah", c.linkedin.url)}
-      ${chan("Personal site", "bit.ly/3LBxljq", c.website.url)}
+      ${chan("YouTube", "A Journalist Who Travels", c.youtube.url)}
     </div>
     <p class="tipnote">Working on something sensitive? Email first and we can arrange an encrypted channel before you share anything.</p>
   </div>
@@ -122,39 +134,62 @@ function foot() {
   </nav>
   <small>© ${year} Masum Billah · Dhaka</small>
 </div></footer>
-<script src="main.js"></script>
+<script src="main.js?v=${V}"></script>
 </body>
 </html>`;
 }
 
-// --- thumbnail + rows -------------------------------------------------------
+// --- thumbnails + rows ------------------------------------------------------
 function thumb(image, outlet) {
   const fb = `<span class="thumb-fb"${image ? " hidden" : ""}>${esc(shortOutlet(outlet))}</span>`;
-  const img = image
-    ? `<img src="${attr(image)}" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">`
-    : "";
+  const img = image ? `<img src="${attr(image)}" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">` : "";
   return `<span class="thumb">${img}${fb}</span>`;
 }
-function archiveRow(x) {
+function archiveRow(x, { showBeat = true, excerpt = false } = {}) {
   const meta = x.year || x.section || "";
-  return `<li class="story" data-outlet="${attr(x.outlet)}" data-title="${attr(x.title.toLowerCase())}" data-year="${attr(x.year || "")}">
+  const b = beatById[x.beat];
+  return `<li class="story" data-beat="${x.beat}" data-outlet="${attr(x.outlet)}" data-title="${attr(x.title.toLowerCase())}" data-year="${attr(x.year || "")}">
   <a href="${attr(x.url)}" target="_blank" rel="noopener">
     ${thumb(x.image, x.outlet)}
     <span class="st-body">
       <span class="st-top"><span class="pub">${esc(x.outlet)}</span><span class="yr">${esc(meta)}</span></span>
       <h4>${esc(x.title)}</h4>
+      ${excerpt && x.excerpt ? `<p class="st-ex">${esc(x.excerpt)}</p>` : ""}
+      ${showBeat && b ? `<span class="st-tag st-tag--${x.beat}">${esc(b.name)}</span>` : ""}
     </span>
     ${arw}
   </a>
 </li>`;
 }
+function leadCard(x) {
+  const b = beatById[x.beat];
+  return `<article class="lead reveal">
+    <a class="story-link" href="${attr(x.url)}" target="_blank" rel="noopener">
+      <span class="lead-media">${thumb(x.image, x.outlet)}</span>
+      <span class="lead-copy">
+        ${x.laurel ? `<span class="laurel">${esc(x.laurel)}</span>` : b ? `<span class="laurel laurel--beat">${esc(b.name)}</span>` : ""}
+        <span class="st-top"><span class="pub">${esc(x.outlet)}</span><span class="yr">${esc(x.year || x.section || "")}</span></span>
+        <h3>${esc(x.title)}</h3>
+        ${x.excerpt ? `<p class="excerpt">${esc(x.excerpt)}</p>` : ""}
+        <span class="read">Read the story ${arw}</span>
+      </span>
+    </a>
+  </article>`;
+}
 
 // ===========================================================================
-// INDEX — name + photo banner, then "Work appeared in" logos
+// INDEX — name + photo banner, then floating "Work appeared in" logos
 // ===========================================================================
+const logoWeight = {
+  "The Business Standard": 3, "The Guardian": 3, "Al Jazeera English": 2.9, "Nikkei Asia": 2.5,
+  "South China Morning Post": 2.1, "The Daily Waadaa": 2, "The Diplomat": 1.9, "VICE": 1.9,
+  "Mongabay": 1.6, "Devex": 1.5, "Just-Style": 1.5,
+};
 function buildIndex() {
-  const logos = outlets
-    .map((o) => `<li class="logo reveal">
+  // Largest first so the float reads deliberately.
+  const ordered = [...outlets].sort((a, b) => (logoWeight[b.name] || 1.5) - (logoWeight[a.name] || 1.5));
+  const logos = ordered
+    .map((o) => `<li class="logo reveal" style="--s:${logoWeight[o.name] || 1.5}">
       <img src="assets/logos/${o.logo}" alt="${attr(o.name)} logo" loading="lazy" onerror="this.style.visibility='hidden'">
       <span>${esc(o.name)}</span>
     </li>`)
@@ -175,69 +210,57 @@ function buildIndex() {
 
 <section class="appeared"><div class="wrap">
   <div class="appeared-head reveal"><p class="eyebrow">Work appeared in</p></div>
-  <ul class="logos">${logos}</ul>
+  <ul class="logos logos--float">${logos}</ul>
 </div></section>
 `;
   return head("Masum Billah · Journalist, Dhaka", site.tagline, "index.html") + body + foot();
 }
 
 // ===========================================================================
-// WORK — most impactful up top, then the full archive
+// WORK — proudest, beat strip, then the full archive
 // ===========================================================================
 function buildWork() {
+  const featured = articles.filter((a) => a.featured).map((a) => archiveMap.get(a.url));
   const lead = featured[0];
   const rest = featured.slice(1);
-  const leadImg = banners[lead.url] || null;
-  const restRows = rest
-    .map((a) => `<li class="story" data-outlet="${attr(a.publication)}" data-title="${attr(a.title.toLowerCase())}">
-      <a href="${attr(a.url)}" target="_blank" rel="noopener">
-        ${thumb(banners[a.url] || null, a.publication)}
-        <span class="st-body">
-          <span class="st-top"><span class="pub">${esc(a.publication)}</span><span class="yr">${esc(a.year)}</span></span>
-          <h4>${esc(a.title)}</h4>
-          <p class="st-ex">${esc(a.excerpt)}</p>
-        </span>
-        ${arw}
-      </a>
-    </li>`)
+  const restRows = rest.map((a) => archiveRow(a, { showBeat: true, excerpt: true })).join("\n");
+
+  const strip = beats
+    .map((b) => `<a class="beatchip" href="beat-${b.id}.html">${esc(b.name)} <span class="c">${beatCounts[b.id] || 0}</span></a>`)
     .join("\n");
 
+  const beatOpts = beats.map((b) => `<option value="${b.id}">${esc(b.name)} (${beatCounts[b.id] || 0})</option>`).join("");
   const outletOpts = archiveOutlets.map((o) => `<option value="${attr(o)}">${esc(o)} (${outletCounts[o]})</option>`).join("");
   const yearOpts = archiveYears.map((y) => `<option value="${esc(y)}">${esc(y)}</option>`).join("");
-  const rows = archive.map(archiveRow).join("\n");
+  const rows = archive.map((x) => archiveRow(x, { showBeat: true })).join("\n");
 
   const body = `
 <section class="page-head"><div class="wrap">
   <p class="eyebrow reveal">Selected work</p>
   <h1 class="display reveal d1">The work I'm proudest of.</h1>
-  <p class="page-sub reveal d2">A handful of the stories that mattered most, then the full archive of everything below.</p>
+  <p class="page-sub reveal d2">A handful of the stories that mattered most, the beats I keep returning to, then the full archive of everything below.</p>
 </div></section>
 
 <section class="impactful"><div class="wrap">
-  <article class="lead reveal">
-    <a class="story-link" href="${attr(lead.url)}" target="_blank" rel="noopener">
-      <span class="lead-media">${thumb(leadImg, lead.publication)}</span>
-      <span class="lead-copy">
-        ${lead.laurel ? `<span class="laurel">${esc(lead.laurel)}</span>` : ""}
-        <span class="st-top"><span class="pub">${esc(lead.publication)}</span><span class="yr">${esc(lead.year)}</span></span>
-        <h3>${esc(lead.title)}</h3>
-        <p class="excerpt">${esc(lead.excerpt)}</p>
-        <span class="read">Read the investigation ${arw}</span>
-      </span>
-    </a>
-  </article>
+  ${leadCard(lead)}
   <ul class="stories impactful-rest">${restRows}</ul>
+</div></section>
+
+<section class="beatstrip-wrap"><div class="wrap">
+  <p class="eyebrow reveal">Explore by beat</p>
+  <nav class="beatstrip reveal" aria-label="Browse by beat">${strip}</nav>
 </div></section>
 
 <section class="archive-full"><div class="wrap">
   <div class="sec-head reveal">
     <h2 class="display">The full archive</h2>
-    <p class="page-sub">Everything published, ${archive.length} pieces and counting. Search, or filter by outlet and year.</p>
+    <p class="page-sub">Everything published, ${archive.length} pieces and counting. Search, or filter by beat, outlet and year.</p>
   </div>
 </div>
 <div class="filterbar filterbar--archive"><div class="wrap">
   <div class="controls">
     <input type="search" id="q" class="search" placeholder="Search titles or outlets…" aria-label="Search stories" autocomplete="off">
+    <select id="f-beat" aria-label="Filter by beat"><option value="">All beats</option>${beatOpts}</select>
     <select id="f-outlet" aria-label="Filter by outlet"><option value="">All outlets (${archive.length})</option>${outletOpts}</select>
     <select id="f-year" aria-label="Filter by year"><option value="">All years</option>${yearOpts}</select>
     <select id="f-sort" aria-label="Sort order">
@@ -254,125 +277,154 @@ function buildWork() {
 </div>
 <div class="sec--tight"></div>
 `;
-  return head("Work · Masum Billah", "Selected and complete work by Masum Billah: investigative and long-form reporting from Bangladesh, published across " + archiveOutlets.length + " newsrooms.", "work.html") + body + foot();
+  return head("Work · Masum Billah", "Selected and complete work by Masum Billah: investigative and long-form reporting from Bangladesh across " + archiveOutlets.length + " newsrooms.", "work.html") + body + foot();
 }
 
 // ===========================================================================
-// FELLOWSHIPS / TRAINING
+// BEAT PAGES — a lead story then highlights, one per beat
+// ===========================================================================
+function buildBeat(b) {
+  const items = archive.filter((x) => x.beat === b.id);
+  const feat = items.filter((x) => curatedFeatured.has(x.url));
+  const ordered = [...feat, ...items.filter((x) => !curatedFeatured.has(x.url))];
+  const lead = ordered[0];
+  const highlights = ordered.slice(1, 13);
+  const rows = highlights.map((x) => archiveRow(x, { showBeat: false, excerpt: !!x.excerpt })).join("\n");
+  const others = beats.filter((x) => x.id !== b.id).map((x) => `<a class="beatchip" href="beat-${x.id}.html">${esc(x.name)}</a>`).join("");
+
+  const body = `
+<section class="page-head page-head--beat"><div class="wrap">
+  <p class="eyebrow reveal"><a href="work.html" class="back">← All work</a></p>
+  <h1 class="display reveal d1">${esc(b.full)}</h1>
+  <p class="page-sub reveal d2">${esc(b.blurb)}</p>
+  <p class="beat-count reveal d2">${items.length} ${items.length === 1 ? "story" : "stories"} in this beat</p>
+</div></section>
+
+<section class="impactful"><div class="wrap">
+  ${lead ? leadCard(lead) : ""}
+  <ul class="stories impactful-rest">${rows}</ul>
+  <a class="btn btn--ghost beat-all" href="work.html#${b.id}">See all ${items.length} in the archive ${arwR}</a>
+</div></section>
+
+<section class="beatstrip-wrap beatstrip-wrap--alt"><div class="wrap">
+  <p class="eyebrow reveal">Other beats</p>
+  <nav class="beatstrip reveal" aria-label="Other beats">${others}</nav>
+</div></section>
+`;
+  return head(`${b.full} · Masum Billah`, `${b.full}: ${b.blurb}`, "work.html") + body + foot();
+}
+
+// ===========================================================================
+// FELLOWSHIPS
 // ===========================================================================
 function buildFellowships() {
-  const fellowList = fellowships
-    .map((f) => `<li class="cred reveal"><div class="cname">${esc(f.name)}</div><div class="cmeta">${esc(f.org)}</div>${f.tag ? `<span class="cyear">${esc(f.tag)}</span>` : ""}</li>`)
-    .join("\n");
-  const awardList = awards
-    .map((a) => `<li class="cred reveal"><div class="cname">${esc(a.name)}</div><div class="cmeta">${esc(a.detail)}</div><span class="cyear">${esc(a.year)}</span></li>`)
-    .join("\n");
-
+  const fellowList = fellowships.map((f) => `<li class="cred reveal"><div class="cname">${esc(f.name)}</div><div class="cmeta">${esc(f.org)}</div>${f.tag ? `<span class="cyear">${esc(f.tag)}</span>` : ""}</li>`).join("\n");
+  const awardList = awards.map((a) => `<li class="cred reveal"><div class="cname">${esc(a.name)}</div><div class="cmeta">${esc(a.detail)}</div><span class="cyear">${esc(a.year)}</span></li>`).join("\n");
   const body = `
 <section class="page-head"><div class="wrap">
   <p class="eyebrow reveal">Fellowships &amp; training</p>
   <h1 class="display reveal d1">The rooms that shaped the reporting.</h1>
   <p class="page-sub reveal d2">Fellowships, newsroom training, and recognition, from climate journalism at Oxford and COP30 to investigative honours at home.</p>
 </div></section>
-
 <section class="sec--tight"><div class="wrap creds-single">
-  <div>
-    <h2 class="display sec-label reveal">Fellowships &amp; programmes</h2>
-    <ul class="cred-list">${fellowList}</ul>
-  </div>
-  <div>
-    <h2 class="display sec-label reveal">Awards &amp; recognition</h2>
-    <ul class="cred-list">${awardList}</ul>
-  </div>
-</div></section>
-`;
+  <div><h2 class="display sec-label reveal">Fellowships &amp; programmes</h2><ul class="cred-list">${fellowList}</ul></div>
+  <div><h2 class="display sec-label reveal">Awards &amp; recognition</h2><ul class="cred-list">${awardList}</ul></div>
+</div></section>`;
   return head("Fellowships & Training · Masum Billah", "Fellowships, training and awards: Oxford Climate Journalism Network, National Press Foundation, CCMP COP30, Earth Journalism Network, and the BRAC Migration Media Award.", "fellowships.html") + body + foot();
 }
 
 // ===========================================================================
-// BEYOND — notes / quick blogs
+// BEYOND
 // ===========================================================================
 function buildBeyond() {
   const list = posts.length
-    ? posts
-        .map((p) => {
-          const d = new Date(p.date);
-          const ds = isNaN(d) ? p.date : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-          return `<article class="note reveal">
-      <div class="note-meta"><span class="note-kind">${esc(p.kind || "Note")}</span><time>${esc(ds)}</time></div>
-      <h2 class="display">${esc(p.title)}</h2>
-      <p>${esc(p.body)}</p>
-    </article>`;
-        })
-        .join("\n")
+    ? posts.map((p) => {
+        const d = new Date(p.date);
+        const ds = isNaN(d) ? p.date : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        return `<article class="note reveal"><div class="note-meta"><span class="note-kind">${esc(p.kind || "Note")}</span><time>${esc(ds)}</time></div><h2 class="display">${esc(p.title)}</h2><p>${esc(p.body)}</p></article>`;
+      }).join("\n")
     : `<p class="empty">Nothing here yet. Check back soon.</p>`;
-
   const body = `
 <section class="page-head"><div class="wrap">
   <p class="eyebrow reveal">Beyond the byline</p>
   <h1 class="display reveal d1">Beyond.</h1>
   <p class="page-sub reveal d2">Notes, half-formed thoughts, and things worth sharing that never make it into a filed story.</p>
 </div></section>
-
-<section class="sec--tight"><div class="wrap notes">${list}</div></section>
-`;
+<section class="sec--tight"><div class="wrap notes">${list}</div></section>`;
   return head("Beyond · Masum Billah", "Notes, quick blogs, and thoughts from journalist Masum Billah.", "beyond.html") + body + foot();
 }
 
 // ===========================================================================
-// ABOUT
+// ABOUT — wide cover, bio, then profile columns
 // ===========================================================================
 function buildAbout() {
-  const ledger = facts.map((f) => `<div><span class="figure">${esc(f.figure)}</span><span class="flabel">${esc(f.label)}</span></div>`).join("");
-  const careerList = career
-    .map((c) => `<li><div class="cname">${esc(c.role)} <span style="color:var(--ink-muted)">· ${esc(c.org)}</span></div><div class="cmeta">${esc(c.note)}</div></li>`)
-    .join("\n");
   const bioParas = site.bio.map((p) => `<p>${esc(p)}</p>`).join("\n        ");
+  const skills = expertise.map((s) => `<li>${esc(s)}</li>`).join("");
+  const accolades = awards.map((a) => `<li><b>${esc(a.name)}</b><span>${esc(a.year)}</span></li>`).join("");
+  const edu = education.map((e) => `<li><b>${esc(e.degree)}</b><span>${esc(e.org)}</span></li>`).join("");
+  const c = site.contact;
+  const elsewhere = [
+    `<li><a href="${attr(c.twitter.url)}" target="_blank" rel="noopener">X / Twitter ${arw}</a></li>`,
+    `<li><a href="${attr(c.linkedin.url)}" target="_blank" rel="noopener">LinkedIn ${arw}</a></li>`,
+    `<li><a href="${attr(c.youtube.url)}" target="_blank" rel="noopener">YouTube ${arw}</a></li>`,
+    `<li><a href="mailto:${attr(c.email)}">Email ${arw}</a></li>`,
+  ].join("");
 
   const body = `
-<section class="about-hero"><div class="wrap">
-  <div class="grid">
-    <div class="bio">
-      <p class="eyebrow reveal">About</p>
-      <h1 class="reveal d1" style="margin-top:1rem">A reporter on migration, climate, and <em>power</em> in Bangladesh.</h1>
-      <div class="reveal d2">
-        ${bioParas}
-      </div>
-      <a class="link-more reveal d3" href="fellowships.html" style="margin-top:1.5rem;display:inline-flex">Fellowships &amp; awards ${arwR}</a>
-    </div>
-    <figure class="about-portrait reveal d2">
-      <div class="frame"><img src="assets/masum-billah.png" alt="Portrait of Masum Billah" width="1024" height="577"></div>
-      <figcaption>Dhaka, Bangladesh</figcaption>
-    </figure>
+<section class="cover">
+  <img class="cover-img" src="assets/masum-cover.jpg" alt="Masum Billah in the Nepal Himalaya" width="1280" height="855">
+  <div class="cover-cap wrap">
+    <p class="eyebrow">About</p>
+    <h1 class="display">Masum Billah</h1>
+    <p class="cover-role">${esc(site.title)} · Dhaka, Bangladesh</p>
   </div>
-</div></section>
+</section>
 
-<section class="sec--tight"><div class="wrap"><div class="ledger reveal">${ledger}</div></div></section>
+<section class="about-body"><div class="wrap">
+  <div class="about-lead reveal">
+    ${bioParas}
+  </div>
 
-<section class="sec--tight"><div class="wrap">
-  <div class="creds">
-    <div class="reveal">
-      <h2 class="display">On the record</h2>
-      <ul class="cred-list">${careerList}</ul>
+  <div class="about-cols">
+    <div class="col reveal">
+      <h2 class="col-h">Beats &amp; expertise</h2>
+      <ul class="tags">${skills}</ul>
     </div>
-    <div class="reveal d1">
-      <h2 class="display">Where the work runs</h2>
-      <ul class="cred-list">
-        ${publications.map((p) => `<li><div class="cname" style="font-size:1.02rem">${esc(p)}</div></li>`).join("\n")}
+    <div class="col reveal d1">
+      <h2 class="col-h">Accolades</h2>
+      <ul class="deflist">${accolades}</ul>
+      <a class="link-more" href="fellowships.html">Fellowships &amp; training ${arwR}</a>
+    </div>
+    <div class="col reveal d2">
+      <h2 class="col-h">Education</h2>
+      <ul class="deflist">${edu}</ul>
+    </div>
+    <div class="col reveal d1">
+      <h2 class="col-h">Languages</h2>
+      <ul class="tags"><li>English</li><li>Bengali</li></ul>
+    </div>
+    <div class="col reveal d2">
+      <h2 class="col-h">Elsewhere</h2>
+      <ul class="linklist">${elsewhere}</ul>
+    </div>
+    <div class="col reveal d3">
+      <h2 class="col-h">On the record</h2>
+      <ul class="deflist">
+        ${career.map((c2) => `<li><b>${esc(c2.role)}</b><span>${esc(c2.org)}</span></li>`).join("")}
       </ul>
     </div>
   </div>
-</div></section>
-`;
-  return head("About · Masum Billah", "Masum Billah is a Dhaka-based journalist, reporter at The Daily Waadaa and Bangladesh correspondent for INS, twice recognised for his migration reporting.", "about.html") + body + foot();
+</div></section>`;
+  return head("About · Masum Billah", "Masum Billah is a Dhaka-based journalist, reporter at The Daily Waadaa and Bangladesh correspondent for INS, covering migration, climate, and power.", "about.html") + body + foot();
 }
 
-// old archive page no longer used
+// ---- write ----------------------------------------------------------------
 try { rmSync(join(ROOT, "archive.html")); } catch {}
-
 writeFileSync(join(ROOT, "index.html"), buildIndex());
 writeFileSync(join(ROOT, "work.html"), buildWork());
+for (const b of beats) writeFileSync(join(ROOT, `beat-${b.id}.html`), buildBeat(b));
 writeFileSync(join(ROOT, "fellowships.html"), buildFellowships());
 writeFileSync(join(ROOT, "beyond.html"), buildBeyond());
 writeFileSync(join(ROOT, "about.html"), buildAbout());
-console.log(`Built index, work (${archive.length} archive rows), fellowships, beyond, about.`);
+console.log(`Built index, work (${archive.length} rows), ${beats.length} beat pages, fellowships, beyond, about.`);
+console.log("Beat distribution:", beatCounts);

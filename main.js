@@ -83,6 +83,7 @@
   var list = document.getElementById("archive-list");
   if (list) {
     var q = document.getElementById("q");
+    var fBeat = document.getElementById("f-beat");
     var fOutlet = document.getElementById("f-outlet");
     var fYear = document.getElementById("f-year");
     var fSort = document.getElementById("f-sort");
@@ -93,12 +94,17 @@
     // The DOM order as built is already newest-first; remember it for sorting.
     items.forEach(function (el, i) { el._ord = i; });
 
+    // Arriving from a beat page's "see all in archive" link (#beat).
+    var h = (location.hash || "").replace("#", "");
+    if (h && fBeat && [].some.call(fBeat.options, function (op) { return op.value === h; })) fBeat.value = h;
+
     var run = function () {
       var term = (q.value || "").trim().toLowerCase();
-      var o = fOutlet.value, y = fYear.value, sort = fSort.value;
+      var bt = fBeat ? fBeat.value : "", o = fOutlet.value, y = fYear.value, sort = fSort.value;
       var shown = 0;
       items.forEach(function (el) {
         var ok =
+          (!bt || el.dataset.beat === bt) &&
           (!o || el.dataset.outlet === o) &&
           (!y || el.dataset.year === y) &&
           (!term || el.dataset.title.indexOf(term) !== -1 || el.dataset.outlet.toLowerCase().indexOf(term) !== -1);
@@ -117,7 +123,8 @@
       noRes.classList.toggle("is-hidden", shown !== 0);
     };
 
-    [q, fOutlet, fYear, fSort].forEach(function (el) {
+    [q, fBeat, fOutlet, fYear, fSort].forEach(function (el) {
+      if (!el) return;
       el.addEventListener("input", run);
       el.addEventListener("change", run);
     });
