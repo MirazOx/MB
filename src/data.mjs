@@ -469,6 +469,15 @@ export const articles = [
 
   // ---------------- Society & Culture ----------------
   {
+    title: "The dog a slice of Old Dhaka called its own",
+    beat: "society",
+    publication: "The Daily Waadaa",
+    year: "2026",
+    url: "https://dailywaadaa.com/feature/2026/09/06/the-dog-a-slice-of-old-dhaka-called-its-own",
+    excerpt:
+      "A tribute to Tomy, a street dog who became a fixture of life in a neighbourhood of Old Dhaka.",
+  },
+  {
     title: "The school with no name: A ray of hope on a lonely char",
     beat: "society",
     publication: "The Business Standard",
