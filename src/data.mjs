@@ -34,6 +34,7 @@ export const site = {
 // The masthead of outlets that have run his work (with self-hosted logo marks).
 export const outlets = [
   { name: "Energy Institute", short: "Energy Inst.", logo: "energyinst.png" },
+  { name: "The Xylom", short: "Xylom", logo: "xylom.png" },
   { name: "The Daily Waadaa", short: "Daily Waadaa", logo: "dailywaadaa.png" },
   { name: "The Guardian", logo: "guardian.svg" },
   { name: "Al Jazeera English", short: "Al Jazeera", logo: "aljazeera.svg" },
@@ -250,6 +251,15 @@ export const articles = [
   },
 
   // ---------------- Climate & Environment ----------------
+  {
+    title: "A Bangladeshi Fashion Brand Is Charging for Paper Bags. Can It Change How People Shop?",
+    beat: "climate",
+    publication: "The Xylom",
+    year: "2026",
+    url: "https://www.thexylom.com/post/bangladesh-single-use-paper-bag-charge",
+    excerpt:
+      "A fashion brand's decision to stop providing free bags shocked customers, but saved millions of bags and funded tree planting.",
+  },
   {
     title: "Snakes beware: reptiles targeted across Bangladesh after a rise in Russell's viper sightings",
     beat: "climate",

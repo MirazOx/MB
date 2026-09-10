@@ -281,7 +281,7 @@ function archiveBlock(items, { withBeat = true } = {}) {
 const logoWeight = {
   "The Business Standard": 3, "The Guardian": 3, "Al Jazeera English": 2.9, "Nikkei Asia": 2.5,
   "South China Morning Post": 2.1, "The Daily Waadaa": 2, "The Diplomat": 1.9, "VICE": 1.9,
-  "Mongabay": 2.8, "Devex": 1.5, "Just-Style": 1.5,
+  "Mongabay": 2.8, "The Xylom": 1.7, "Devex": 1.5, "Just-Style": 1.5,
 };
 function buildIndex() {
   // Largest first so the float reads deliberately.
